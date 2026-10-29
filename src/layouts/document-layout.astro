@@ -22,6 +22,11 @@ const { title, description } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
     <ClientRouter />
+    <script>
+      import { trackProductNavigation } from "@/lib/product-navigation";
+
+      trackProductNavigation();
+    </script>
   </head>
   <body>
     <slot />

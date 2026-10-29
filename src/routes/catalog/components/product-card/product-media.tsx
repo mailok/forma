@@ -1,5 +1,6 @@
 import type { Handle } from "remix/component";
 import { cn } from "@/lib/utils";
+import { Icon } from "@/components/icon";
 import { productImageTransitionName } from "@/lib/view-transitions";
 import { ProductBadgeTag } from "@/components/product/product-badge-tag";
 import type { ProductSummary } from "@/db/types";
@@ -47,9 +48,24 @@ export function ProductMedia(handle: Handle<ProductMediaProps>) {
           />
         ) : null}
         {soldOut && view === "grid" ? <SoldOutTag /> : null}
+        <ProductPendingNotice />
       </div>
     );
   };
+}
+
+function ProductPendingNotice() {
+  return () => (
+    <div class="pointer-events-none absolute inset-0 hidden items-center justify-center bg-paper/35 p-3 backdrop-blur-[2px] group-data-pending:flex">
+      <span
+        role="status"
+        class="inline-flex flex-wrap items-center justify-center gap-2 rounded-2xl bg-ink/90 px-4 py-3 text-center text-xs font-medium text-paper shadow-lg sm:rounded-full"
+      >
+        <Icon name="spinner" class="size-4 motion-safe:animate-spin" />
+        Loading details…
+      </span>
+    </div>
+  );
 }
 
 function SoldOutTag() {

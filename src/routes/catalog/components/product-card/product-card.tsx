@@ -1,5 +1,6 @@
 import type { Handle } from "remix/component";
 import { cn } from "@/lib/utils";
+import { paths } from "@/lib/paths";
 import type { ProductSummary } from "@/db/types";
 import type { ProductView } from "@/routes/catalog/types";
 import { ProductMedia } from "./product-media";
@@ -20,7 +21,11 @@ export function ProductCard(handle: Handle<Props>) {
   return () => (
     <article
       data-product-id={handle.props.product.id}
-      class={cn("group relative", layouts[handle.props.view])}
+      data-product-path={paths.product(handle.props.product.slug)}
+      class={cn(
+        "group relative rounded-[28px] data-pending:cursor-progress",
+        layouts[handle.props.view],
+      )}
     >
       <ProductMedia
         product={handle.props.product}

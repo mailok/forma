@@ -1,6 +1,7 @@
 import type { Handle, RemixNode } from "remix/component";
 import { cn } from "@/lib/utils";
 import { paths } from "@/lib/paths";
+import { Icon } from "@/components/icon";
 import { ProductMetadata } from "@/components/product/product-metadata";
 import { ProductPrice } from "@/components/product/product-price";
 import { ProductColors } from "@/components/product/product-colors";
@@ -59,9 +60,13 @@ function ProductLink(handle: Handle<ProductLinkProps>) {
   return () => (
     <a
       href={paths.product(handle.props.slug)}
-      class="after:absolute after:inset-0 after:rounded-[28px] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-forest/40 focus-visible:after:ring-offset-4 focus-visible:after:ring-offset-canvas"
+      class="inline-flex items-center gap-2 after:absolute after:inset-0 after:rounded-[28px] group-data-pending:cursor-progress focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-forest/40 focus-visible:after:ring-offset-4 focus-visible:after:ring-offset-canvas"
     >
       {handle.props.children}
+      <Icon
+        name="spinner"
+        class="hidden size-4 shrink-0 text-forest group-data-pending:block motion-safe:animate-spin"
+      />
     </a>
   );
 }

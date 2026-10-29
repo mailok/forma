@@ -1,12 +1,25 @@
 ---
 import DocumentLayout from "@/layouts/document-layout.astro";
 import ProductPage from "@/routes/product/page";
+import ProductNotFoundPage from "@/routes/product/not-found-page";
 import { db } from "@/db/client";
 
 const product = db.products.findUnique(Astro.params.slug ?? "");
-if (!product) return new Response("Product not found.", { status: 404 });
+if (!product) Astro.response.status = 404;
 ---
 
-<DocumentLayout title={`${product.name} — Forma`} description={product.title}>
-  <ProductPage client:load initialProduct={product} />
+<DocumentLayout
+  title={product ? `${product.name} — Forma` : "Product not found — Forma"}
+  description={
+    product?.title ??
+      "This product could not be found. Explore the Forma collection to find something else you'll love."
+  }
+>
+  {
+    product ? (
+      <ProductPage client:load initialProduct={product} />
+    ) : (
+      <ProductNotFoundPage />
+    )
+  }
 </DocumentLayout>
