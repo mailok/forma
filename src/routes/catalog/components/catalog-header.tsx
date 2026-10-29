@@ -5,8 +5,8 @@ import { Container } from "@/components/layout/container";
 
 export function CatalogHeader() {
   return () => (
-    <header class="border-b border-stone-200/80 bg-[#fbfcf8]">
-      <Container class="flex h-20 items-center justify-between gap-6">
+    <header class="sticky top-0 z-30 border-b border-line/80 bg-canvas/85 backdrop-blur-lg">
+      <Container class="flex h-16 items-center justify-between gap-6">
         <HeaderBrand />
         <MainNavigation />
         <DemoBadge />
@@ -22,14 +22,12 @@ function HeaderBrand() {
       class="flex items-center gap-2.5 text-ink"
       aria-label="Forma, home"
     >
-      <BrandMark />
-      <span class="text-[30px] leading-none font-semibold tracking-[-0.065em]">
-        forma<span class="text-[#a1ad8b]">.</span>
+      <BrandMark class="size-6 text-ink" />
+      <span class="font-display text-[30px] leading-none tracking-[-0.02em]">
+        forma<span class="text-clay">.</span>
       </span>
-      <span class="ml-4 hidden border-l border-stone-200 pl-5 text-[9px] leading-relaxed tracking-[0.18em] text-stone-400 uppercase md:block">
-        Thoughtfully
-        <br />
-        chosen objects
+      <span class="ml-3 hidden border-l border-line pl-4 text-xs text-stone-500 md:block">
+        Thoughtfully chosen objects
       </span>
     </a>
   );
@@ -37,10 +35,7 @@ function HeaderBrand() {
 
 function MainNavigation() {
   return () => (
-    <nav
-      aria-label="Main navigation"
-      class="flex items-center gap-7 text-[12px]"
-    >
+    <nav aria-label="Main navigation" class="flex items-center gap-8 text-sm">
       <NavLink href="#catalog" active class="hidden sm:block">
         Explore
       </NavLink>
@@ -62,7 +57,7 @@ function NavLink(handle: Handle<NavLinkProps>) {
       href={handle.props.href}
       class={cn(
         handle.props.active
-          ? "font-semibold text-emerald-900 underline decoration-emerald-800/40 underline-offset-8"
+          ? "font-medium text-ink underline decoration-clay decoration-[1.5px] underline-offset-[10px]"
           : "text-stone-500 transition-colors hover:text-ink",
         handle.props.class,
       )}
@@ -74,9 +69,8 @@ function NavLink(handle: Handle<NavLinkProps>) {
 
 function DemoBadge() {
   return () => (
-    <div class="hidden items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-1.5 text-[10px] text-stone-500 sm:flex">
-      <span class="size-1.5 rounded-full bg-[#91aa76]" />A demo, built with
-      Remix
+    <div class="hidden items-center gap-2 rounded-full border border-line bg-paper/70 px-3.5 py-1.5 text-xs text-stone-500 sm:flex">
+      <span class="size-1.5 rounded-full bg-forest" />A demo built with Remix
     </div>
   );
 }

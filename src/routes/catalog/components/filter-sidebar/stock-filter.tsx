@@ -6,8 +6,8 @@ export function StockFilter(handle: Handle) {
   const context = handle.context.get(catalog.Context);
 
   return () => (
-    <div class="border-t border-stone-100 pt-5">
-      <label class="flex cursor-pointer items-center justify-between gap-2 text-[13px] text-stone-600">
+    <div class="border-t border-line pt-7">
+      <label class="flex cursor-pointer items-center justify-between gap-3 text-sm text-stone-600">
         In stock only
         <Switch
           name="inStock"

@@ -15,7 +15,7 @@ export function FilterSidebar(handle: Handle) {
       id="filters"
       aria-label="Product filters"
       class={cn(
-        "self-start rounded-2xl border border-stone-200/80 bg-white p-5 lg:sticky lg:top-6 lg:block",
+        "self-start rounded-3xl border border-line bg-paper p-6 lg:sticky lg:top-24 lg:block lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0",
         context.state.mobileFilters ? "block" : "hidden",
       )}
     >

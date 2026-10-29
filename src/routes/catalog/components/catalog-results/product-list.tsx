@@ -5,8 +5,8 @@ import type { ProductView } from "@/routes/catalog/types";
 import { ProductCard } from "@/routes/catalog/components/product-card/product-card";
 
 const layouts: Record<ProductView, string> = {
-  grid: "gap-5 min-[560px]:grid-cols-2 xl:grid-cols-3",
-  list: "gap-4",
+  grid: "gap-x-6 gap-y-14 min-[560px]:grid-cols-2 xl:grid-cols-3",
+  list: "gap-3",
 };
 
 interface Props {

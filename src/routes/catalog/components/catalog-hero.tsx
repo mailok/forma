@@ -1,5 +1,20 @@
 import type { Handle } from "remix/component";
-import { cn } from "@/lib/utils";
+import { Icon } from "@/components/icon";
+import { categoryCopy } from "@/db/catalog-labels";
+import type { CategoryId } from "@/db/types";
+
+interface FeaturedObject {
+  name: string;
+  image: string;
+  category: CategoryId;
+}
+
+const featuredObjects: FeaturedObject[] = [
+  { name: "Sunday Sofa", image: "/products/vase.jpg", category: "home" },
+  { name: "Flow Bottle", image: "/products/bottle.jpg", category: "outdoors" },
+  { name: "Form Chair", image: "/products/chair.jpg", category: "home" },
+  { name: "Trail Runner", image: "/products/trail.jpg", category: "outdoors" },
+];
 
 interface CatalogHeroProps {
   total: number;
@@ -7,103 +22,115 @@ interface CatalogHeroProps {
 
 export function CatalogHero(handle: Handle<CatalogHeroProps>) {
   return () => (
-    <section
-      class="relative overflow-hidden rounded-2xl bg-[#e9eee3]"
-      aria-labelledby="catalog-heading"
-    >
-      <HeroCopy />
-      <HeroCollage total={handle.props.total} />
+    <section aria-labelledby="catalog-heading">
+      <HeroIntro total={handle.props.total} />
+      <FeaturedStrip />
     </section>
   );
 }
 
-function HeroCopy() {
-  return () => (
-    <div class="relative z-10 max-w-xl px-7 py-9 sm:px-10 sm:py-10">
-      <p class="mb-4 flex items-center gap-2.5 text-[9px] font-semibold tracking-[0.2em] text-[#74846a] uppercase">
-        <span class="h-px w-6 bg-[#91a17f]" />
-        The everyday collection · Vol. 01
-      </p>
-      <h1
-        id="catalog-heading"
-        class="text-[38px] leading-[1.08] font-medium tracking-[-0.055em] text-ink sm:text-[52px]"
-      >
-        Good objects.
-        <br />
-        <span class="text-[#6e8763]">Better days.</span>
-      </h1>
-      <p class="mt-5 max-w-75 text-[13px] leading-relaxed text-[#74816d]">
-        Technology, design and essentials for your everyday life. Find what
-        feels like you.
-      </p>
-    </div>
-  );
-}
-
-interface HeroCollageProps {
+interface HeroIntroProps {
   total: number;
 }
 
-function HeroCollage(handle: Handle<HeroCollageProps>) {
+function HeroIntro(handle: Handle<HeroIntroProps>) {
   return () => (
-    <div
-      class="pointer-events-none absolute top-0 right-0 hidden h-full w-[48%] items-center justify-center overflow-hidden md:flex"
-      aria-hidden="true"
-    >
-      <CollageRing class="-right-10 size-95" />
-      <CollageRing class="right-9 size-67.5" />
-      <div class="relative ml-8 flex items-center gap-4 lg:gap-6">
-        <CollagePhoto
-          src="/products/chair.jpg"
-          class="mt-9 h-44 w-32 -rotate-12 lg:h-52 lg:w-40"
-        />
-        <CollagePhoto
-          src="/products/headphones.jpg"
-          class="-mt-9 h-48 w-36 rotate-[9deg] lg:h-56 lg:w-44"
-        />
+    <div class="grid items-end gap-10 lg:grid-cols-[minmax(0,1fr)_340px] xl:gap-20">
+      <div>
+        <p class="mb-6 flex items-center gap-3 text-[11px] font-medium tracking-[0.22em] text-stone-500 uppercase">
+          <span class="h-px w-8 bg-stone-400" />
+          The everyday collection · Vol. 01
+        </p>
+        <h1
+          id="catalog-heading"
+          class="font-display text-[52px] leading-[0.92] tracking-[-0.025em] text-ink sm:text-[72px] xl:text-[88px]"
+        >
+          Good objects,
+          <br />
+          <em class="text-forest">better days.</em>
+        </h1>
       </div>
-      <span class="absolute right-6 bottom-5 text-[9px] tracking-[0.12em] text-[#7f8f73] uppercase">
-        {handle.props.total} objects. Endless possibilities.
-      </span>
+      <div class="lg:pb-2">
+        <p class="text-base leading-relaxed text-pretty text-stone-600">
+          Technology, design and essentials for your everyday life. Find what
+          feels like you.
+        </p>
+        <div class="mt-6 flex flex-wrap items-center gap-x-7 gap-y-5">
+          <HeroCallToAction />
+          <HeroStat value={handle.props.total} label="objects" />
+        </div>
+      </div>
     </div>
   );
 }
 
-interface CollageRingProps {
-  class: string;
-}
-
-function CollageRing(handle: Handle<CollageRingProps>) {
+function HeroCallToAction() {
   return () => (
-    <div
-      class={cn(
-        "absolute rounded-full border border-[#d5dfcc]",
-        handle.props.class,
-      )}
-    />
-  );
-}
-
-interface CollagePhotoProps {
-  src: string;
-  class: string;
-}
-
-function CollagePhoto(handle: Handle<CollagePhotoProps>) {
-  return () => (
-    <div
-      class={cn(
-        "overflow-hidden rounded-xl border-[5px] border-white bg-white shadow-xl shadow-[#617751]/15",
-        handle.props.class,
-      )}
+    <a
+      href="#catalog"
+      class="group inline-flex h-12 items-center gap-2.5 rounded-full bg-ink px-7 text-sm font-medium text-paper transition-colors hover:bg-forest focus-visible:ring-2 focus-visible:ring-forest/40 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas focus-visible:outline-none"
     >
-      <img
-        src={handle.props.src}
-        alt=""
-        width="720"
-        height="600"
-        class="size-full object-cover"
+      Explore the collection
+      <Icon
+        name="arrow"
+        class="size-4 transition-transform group-hover:translate-x-0.5"
       />
+    </a>
+  );
+}
+
+interface HeroStatProps {
+  value: number;
+  label: string;
+}
+
+function HeroStat(handle: Handle<HeroStatProps>) {
+  return () => (
+    <p class="flex items-baseline gap-1.5 text-sm text-stone-500">
+      <span class="font-display text-[32px] leading-none text-ink">
+        {handle.props.value}
+      </span>
+      {handle.props.label}
+    </p>
+  );
+}
+
+function FeaturedStrip() {
+  return () => (
+    <div class="mt-10 grid grid-cols-2 gap-4 sm:mt-12 sm:gap-5 md:grid-cols-4">
+      {featuredObjects.map((object) => (
+        <FeaturedFigure key={object.name} object={object} />
+      ))}
     </div>
   );
+}
+
+interface FeaturedFigureProps {
+  object: FeaturedObject;
+}
+
+function FeaturedFigure(handle: Handle<FeaturedFigureProps>) {
+  return () => {
+    const { object } = handle.props;
+
+    return (
+      <figure class="group">
+        <div class="aspect-4/3 overflow-hidden rounded-3xl bg-stone-200/60">
+          <img
+            src={object.image}
+            alt=""
+            width="720"
+            height="600"
+            class="size-full object-cover transition-transform duration-700 ease-out motion-safe:group-hover:scale-[1.03]"
+          />
+        </div>
+        <figcaption class="mt-3 flex items-baseline justify-between gap-2 px-1 text-[13px]">
+          <span class="font-medium text-ink">{object.name}</span>
+          <span class="text-stone-500">
+            {categoryCopy[object.category].label}
+          </span>
+        </figcaption>
+      </figure>
+    );
+  };
 }

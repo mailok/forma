@@ -2,26 +2,21 @@ import type { Handle, HostProps, Props as ElementProps } from "remix/component";
 import { cn } from "@/lib/utils";
 
 const variants = {
-  primary:
-    "rounded-lg border-transparent bg-emerald-900 text-white hover:bg-emerald-800",
+  primary: "rounded-full border-transparent bg-ink text-paper hover:bg-forest",
   outline:
-    "rounded-lg border-stone-200 bg-white text-ink hover:border-emerald-800 hover:bg-[#f0f4ed]",
+    "rounded-full border-line bg-paper text-ink hover:border-ink/30 hover:bg-white",
   ghost:
-    "rounded-lg border-transparent bg-transparent text-stone-500 hover:bg-stone-100 hover:text-ink aria-pressed:bg-[#e6ede6] aria-pressed:text-emerald-900",
-  link: "rounded border-transparent bg-transparent text-emerald-800 underline-offset-4 hover:underline",
-  chip: "rounded-md border-[#dce7df] bg-[#eef4ef] text-[#426b53] hover:bg-[#dceadf]",
-  pill: "rounded-full border-stone-200 bg-white text-stone-500 hover:border-stone-300 hover:text-ink aria-pressed:border-emerald-900 aria-pressed:bg-emerald-900 aria-pressed:text-white",
+    "rounded-full border-transparent bg-transparent text-stone-500 hover:bg-ink/5 hover:text-ink aria-pressed:bg-paper aria-pressed:text-ink aria-pressed:shadow-xs aria-pressed:shadow-stone-900/10",
+  link: "rounded border-transparent bg-transparent text-forest underline decoration-forest/30 underline-offset-4 hover:decoration-forest",
 } as const;
 
 const sizes = {
-  default: "h-10 px-4 text-xs",
-  sm: "h-8 px-3 text-xs",
-  lg: "h-11 px-6 text-sm",
-  field: "h-11 px-3 text-[13px]",
-  compact: "p-0 text-xs",
-  chip: "px-2.5 py-1.5 text-[11px]",
-  icon: "size-8 p-0",
-  "icon-sm": "size-7 p-0",
+  default: "h-10 px-5 text-[13px]",
+  sm: "h-9 px-4 text-[13px]",
+  lg: "h-12 px-7 text-sm",
+  compact: "p-0 text-[13px]",
+  icon: "size-9 p-0",
+  "icon-sm": "size-8 p-0",
 } as const;
 
 const alignments = {
@@ -54,7 +49,7 @@ export function Button(handle: Handle<Props>) {
         {...attributes}
         type={attributes.type ?? "button"}
         class={cn(
-          "inline-flex shrink-0 items-center gap-2 border font-medium transition-colors focus-visible:ring-2 focus-visible:ring-emerald-700/40 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+          "inline-flex shrink-0 items-center gap-2 border font-medium transition-colors focus-visible:ring-2 focus-visible:ring-forest/40 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
           alignments[align],
           variants[variant],
           sizes[size],

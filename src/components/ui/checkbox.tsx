@@ -11,14 +11,14 @@ interface Props {
 
 export function Checkbox(handle: Handle<Props>) {
   return () => (
-    <span class="relative flex size-4 shrink-0 items-center justify-center">
+    <span class="relative flex size-4.5 shrink-0 items-center justify-center">
       <input
         type="checkbox"
         name={handle.props.name}
         value={handle.props.value}
         checked={handle.props.checked}
         disabled={handle.props.disabled}
-        class="peer size-4 cursor-pointer appearance-none rounded-sm border border-stone-300 bg-white transition-colors checked:border-emerald-800 checked:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-emerald-700 disabled:cursor-not-allowed"
+        class="peer size-4.5 cursor-pointer appearance-none rounded-[5px] border border-stone-300 bg-paper transition-colors checked:border-ink checked:bg-ink hover:border-stone-400 checked:hover:border-ink focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-forest disabled:cursor-not-allowed disabled:opacity-50"
         mix={on("change", (event) =>
           handle.props.onCheckedChange(
             (event.currentTarget as HTMLInputElement).checked,
@@ -27,7 +27,7 @@ export function Checkbox(handle: Handle<Props>) {
       />
       <Icon
         name="check"
-        class="pointer-events-none absolute size-3 text-white opacity-0 peer-checked:opacity-100"
+        class="pointer-events-none absolute size-3 text-paper opacity-0 peer-checked:opacity-100"
       />
     </span>
   );

@@ -9,7 +9,7 @@ export function ResultsError(handle: Handle) {
     context.state.error ? (
       <div
         role="alert"
-        class="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900"
+        class="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-clay/20 bg-clay-soft/70 px-5 py-4 text-sm text-ink"
       >
         <p>{context.state.error}</p>
         <Button

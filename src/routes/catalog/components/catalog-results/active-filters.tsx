@@ -1,7 +1,7 @@
 import { on, type Handle } from "remix/component";
 import * as catalog from "@/routes/catalog/components/catalog";
-import { Icon } from "@/components/icon";
 import { Button } from "@/components/ui/button";
+import { RemovableBadge } from "@/components/ui/removable-badge";
 import { filterKeys } from "@/db/catalog-options";
 import type { FilterKey } from "@/db/types";
 
@@ -48,37 +48,41 @@ export function ActiveFilters(handle: Handle) {
 
     return (
       <div
-        class="mb-5 flex flex-wrap items-center gap-2"
+        class="mb-8 flex flex-wrap items-center gap-2"
         aria-label="Active filters"
       >
         {filters.category !== "all" ? (
-          <FilterChip
-            label={categoryLabel()}
+          <RemovableBadge
             removeLabel="Remove category filter"
             onRemove={() => context.selectCategory("all")}
-          />
+          >
+            {categoryLabel()}
+          </RemovableBadge>
         ) : null}
         {filters.q ? (
-          <FilterChip
-            label={`“${filters.q}”`}
+          <RemovableBadge
             removeLabel="Clear search"
             onRemove={() => context.clearSearch()}
-          />
+          >
+            “{filters.q}”
+          </RemovableBadge>
         ) : null}
         {selectedFacets().map((facet) => (
-          <FilterChip
+          <RemovableBadge
             key={`${facet.key}-${facet.value}`}
-            label={facet.label}
             removeLabel={`Remove ${facet.label} filter`}
             onRemove={() => context.toggleFilter(facet.key, facet.value)}
-          />
+          >
+            {facet.label}
+          </RemovableBadge>
         ))}
         {filters.inStock ? (
-          <FilterChip
-            label="In stock"
+          <RemovableBadge
             removeLabel="Remove in-stock filter"
             onRemove={() => context.setInStock(false)}
-          />
+          >
+            In stock
+          </RemovableBadge>
         ) : null}
         <Button
           variant="link"
@@ -90,24 +94,4 @@ export function ActiveFilters(handle: Handle) {
       </div>
     );
   };
-}
-
-interface FilterChipProps {
-  label: string;
-  removeLabel: string;
-  onRemove(): void;
-}
-
-function FilterChip(handle: Handle<FilterChipProps>) {
-  return () => (
-    <Button
-      variant="chip"
-      size="chip"
-      aria-label={handle.props.removeLabel}
-      mix={on("click", () => handle.props.onRemove())}
-    >
-      {handle.props.label}
-      <Icon name="close" class="size-3" />
-    </Button>
-  );
 }

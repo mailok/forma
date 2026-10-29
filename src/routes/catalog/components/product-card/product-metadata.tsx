@@ -9,12 +9,12 @@ interface Props {
 
 export function ProductMetadata(handle: Handle<Props>) {
   return () => (
-    <div class="mb-2 flex items-center justify-between gap-2">
-      <span class="text-[9px] font-bold tracking-[0.17em] text-stone-400 uppercase">
+    <div class="flex items-center justify-between gap-2">
+      <span class="text-[11px] font-medium tracking-[0.18em] text-stone-500 uppercase">
         {handle.props.brand}
       </span>
-      <span class="flex items-center gap-1 text-[11px] text-stone-500 tabular-nums">
-        <Icon name="star" filled class="size-3 text-[#b79355]" />
+      <span class="flex items-center gap-1 text-xs text-stone-600 tabular-nums">
+        <Icon name="star" filled class="size-3 text-clay" />
         {handle.props.rating.toFixed(1)}
         <span class="text-stone-400">({handle.props.reviews})</span>
       </span>

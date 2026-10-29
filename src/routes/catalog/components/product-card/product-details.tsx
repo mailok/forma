@@ -7,6 +7,11 @@ import { ProductPrice } from "./product-price";
 import { ProductColors } from "./product-colors";
 import { ProductAvailability } from "./product-availability";
 
+const detailsLayouts: Record<ProductView, string> = {
+  grid: "px-1 pt-5",
+  list: "min-w-0 py-2 pr-3 sm:pr-6",
+};
+
 interface Props {
   product: ProductSummary;
   view: ProductView;
@@ -17,22 +22,19 @@ export function ProductDetails(handle: Handle<Props>) {
     const { product, view } = handle.props;
 
     return (
-      <div
-        class={cn(
-          "flex flex-col p-4",
-          view === "list" && "justify-center sm:px-6",
-        )}
-      >
+      <div class={cn("flex flex-col", detailsLayouts[view])}>
         <ProductMetadata
           brand={product.brand}
           rating={product.rating}
           reviews={product.reviews}
         />
-        <h3 class="text-[17px] font-semibold tracking-[-0.025em] text-ink">
+        <h3 class="mt-2 text-lg leading-tight font-semibold tracking-[-0.015em] text-ink">
           {product.name}
         </h3>
-        <p class="mt-1 truncate text-xs text-stone-500">{product.title}</p>
-        <div class="mt-4 flex items-center justify-between gap-2">
+        <p class="mt-1.5 truncate text-[13px] text-stone-500">
+          {product.title}
+        </p>
+        <div class="mt-5 flex items-center justify-between gap-3">
           <ProductPrice
             price={product.price}
             originalPrice={product.originalPrice}

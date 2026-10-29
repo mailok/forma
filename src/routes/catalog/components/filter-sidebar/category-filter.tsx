@@ -16,7 +16,7 @@ export function CategoryFilter(handle: Handle) {
         name="category"
         label="Category"
         value={context.state.filters.category}
-        class="mb-5"
+        class="mb-7"
         options={context.categories.map(toCategoryOption)}
         onValueChange={(value) => context.selectCategory(value as CategoryId)}
       />

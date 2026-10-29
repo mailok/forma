@@ -1,8 +1,27 @@
-@import "@fontsource-variable/dm-sans";
+@import "@fontsource-variable/instrument-sans";
+@import "@fontsource/instrument-serif";
+@import "@fontsource/instrument-serif/400-italic.css";
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "DM Sans Variable", ui-sans-serif, system-ui, sans-serif;
-  --color-ink: #203e36;
-  --color-canvas: #f7f8f4;
+  --font-sans:
+    "Instrument Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Instrument Serif", ui-serif, Georgia, serif;
+
+  --color-canvas: #f4f1ea;
+  --color-paper: #fbfaf6;
+  --color-ink: #1b2420;
+  --color-line: #e3ddd2;
+  --color-forest: #2f4b3c;
+  --color-forest-soft: #e3e9e0;
+  --color-clay: #a95d3b;
+  --color-clay-soft: #f2e3d7;
+}
+
+/* Tailwind v4 preflight resets buttons to the default cursor. */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
 }

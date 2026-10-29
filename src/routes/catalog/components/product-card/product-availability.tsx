@@ -10,8 +10,8 @@ interface StockStyle {
 
 const stockStyles: Record<StockLevel, StockStyle> = {
   out: { text: "text-stone-400", dot: "bg-stone-300" },
-  low: { text: "text-amber-700", dot: "bg-amber-500" },
-  available: { text: "text-[#6a7c63]", dot: "bg-[#8aab78]" },
+  low: { text: "text-clay", dot: "bg-clay" },
+  available: { text: "text-forest", dot: "bg-forest/70" },
 };
 
 interface Props {
@@ -25,12 +25,12 @@ export function ProductAvailability(handle: Handle<Props>) {
     const styles = stockStyles[stockLevel(stock)];
 
     return (
-      <div class="mt-3 flex items-center justify-between border-t border-stone-100 pt-3">
-        <span class={cn("flex items-center gap-1.5 text-[10px]", styles.text)}>
+      <div class="mt-4 flex items-center justify-between border-t border-line pt-3.5">
+        <span class={cn("flex items-center gap-2 text-xs", styles.text)}>
           <span class={cn("size-1.5 rounded-full", styles.dot)} />
           {stock === 0 ? "Out of stock" : `${stock} in stock`}
         </span>
-        <span class="text-[9px] tracking-wide text-stone-400">{sku}</span>
+        <span class="text-[10px] tracking-[0.12em] text-stone-400">{sku}</span>
       </div>
     );
   };

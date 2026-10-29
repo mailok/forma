@@ -27,7 +27,7 @@ const viewOptions: ViewOption[] = [
 
 export function CatalogToolbar() {
   return () => (
-    <div class="flex flex-wrap items-center justify-between gap-3 py-5">
+    <div class="flex flex-wrap items-center justify-between gap-4 py-7">
       <ToolbarGroup>
         <ResultCount />
         <FiltersToggle />
@@ -57,15 +57,21 @@ function ResultCount(handle: Handle) {
     const { status, searchResults } = context.state;
 
     return (
-      <p role="status" aria-live="polite" class="text-xs text-stone-500">
+      <p
+        role="status"
+        aria-live="polite"
+        class="flex h-8 items-baseline gap-2 text-sm text-stone-500"
+      >
         {status === "loading" ? (
-          <span class="flex items-center gap-2 text-emerald-800">
-            <Icon name="spinner" class="size-3.5 animate-spin" />
+          <span class="flex items-center gap-2 self-center text-forest">
+            <Icon name="spinner" class="size-4 animate-spin" />
             Updating your selection…
           </span>
         ) : (
           <>
-            <span class="font-semibold text-ink">{searchResults.total}</span>{" "}
+            <span class="text-[22px] leading-none font-semibold tracking-[-0.02em] text-ink tabular-nums">
+              {searchResults.total}
+            </span>
             {searchResults.total === 1
               ? "product to discover"
               : "products to discover"}
@@ -91,9 +97,13 @@ function FiltersToggle(handle: Handle) {
         class="lg:hidden"
         mix={on("click", () => context.toggleMobileFilters())}
       >
-        <Icon name="sliders" class="size-3.5" />
+        <Icon name="sliders" class="size-4" />
         Filters
-        {count ? ` (${count})` : ""}
+        {count ? (
+          <span class="flex size-5 items-center justify-center rounded-full bg-ink text-[11px] text-paper tabular-nums">
+            {count}
+          </span>
+        ) : null}
       </Button>
     );
   };
@@ -104,10 +114,7 @@ function SortSelect(handle: Handle) {
 
   return () => (
     <>
-      <label
-        for="product-sort"
-        class="hidden text-[11px] text-stone-400 sm:block"
-      >
+      <label for="product-sort" class="hidden text-[13px] text-stone-400 sm:block">
         Sort by
       </label>
       <Select
@@ -115,7 +122,7 @@ function SortSelect(handle: Handle) {
         label="Sort products"
         value={context.state.filters.sort}
         variant="subtle"
-        class="w-44"
+        class="w-48"
         options={sortOptions}
         onValueChange={(value) => context.sort(value as SortOrder)}
       />
@@ -127,7 +134,7 @@ function ViewToggle(handle: Handle) {
   const context = handle.context.get(catalog.Context);
 
   return () => (
-    <div class="flex gap-0.5 border-l border-stone-200 pl-3">
+    <div class="flex gap-0.5 rounded-full bg-ink/5 p-0.5">
       {viewOptions.map((option) => (
         <Button
           key={option.value}
@@ -137,7 +144,7 @@ function ViewToggle(handle: Handle) {
           size="icon-sm"
           mix={on("click", () => context.setView(option.value))}
         >
-          <Icon name={option.icon} class="size-3.5" />
+          <Icon name={option.icon} class="size-4" />
         </Button>
       ))}
     </div>

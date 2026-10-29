@@ -7,13 +7,13 @@ interface Props {
 export function ProductColors(handle: Handle<Props>) {
   return () => (
     <span
-      class="flex -space-x-0.5"
+      class="flex gap-1.5"
       aria-label={`${handle.props.colors.length} available colors`}
     >
       {handle.props.colors.map((color) => (
         <span
           key={color}
-          class="size-3 rounded-full border-2 border-white ring-1 ring-stone-200/80"
+          class="size-3.5 rounded-full shadow-[inset_0_0_0_1px_rgb(27_36_32/0.14)]"
           style={{ backgroundColor: color }}
         />
       ))}

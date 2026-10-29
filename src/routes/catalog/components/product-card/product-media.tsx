@@ -9,11 +9,13 @@ interface BadgeStyle {
 }
 
 const badges: Record<ProductBadge, BadgeStyle> = {
-  new: { label: "New arrival", class: "bg-white/90 text-ink" },
-  favorite: {
-    label: "House favorite",
-    class: "bg-[#e4eedf]/95 text-[#4c6541]",
-  },
+  new: { label: "New arrival", class: "bg-paper/90 text-ink" },
+  favorite: { label: "House favorite", class: "bg-clay/90 text-paper" },
+};
+
+const mediaShapes: Record<ProductView, string> = {
+  grid: "aspect-4/5 rounded-[28px]",
+  list: "aspect-square rounded-[20px]",
 };
 
 interface ProductMediaProps {
@@ -25,12 +27,13 @@ interface ProductMediaProps {
 export function ProductMedia(handle: Handle<ProductMediaProps>) {
   return () => {
     const { product, view, priority } = handle.props;
+    const soldOut = product.stock === 0;
 
     return (
       <div
         class={cn(
-          "relative overflow-hidden bg-[#eeefeb]",
-          view === "list" ? "h-full min-h-40" : "aspect-[1.28]",
+          "relative overflow-hidden bg-stone-200/60",
+          mediaShapes[view],
         )}
       >
         <img
@@ -39,10 +42,13 @@ export function ProductMedia(handle: Handle<ProductMediaProps>) {
           width="720"
           height="600"
           loading={priority ? "eager" : "lazy"}
-          class="size-full object-cover transition-transform duration-700 motion-safe:group-hover:scale-105"
+          class={cn(
+            "size-full object-cover transition-transform duration-700 ease-out motion-safe:group-hover:scale-[1.04]",
+            soldOut && "opacity-80 grayscale-[0.6]",
+          )}
         />
         {product.badge ? <MediaBadge badge={product.badge} /> : null}
-        {product.stock === 0 ? <SoldOutTag /> : null}
+        {soldOut && view === "grid" ? <SoldOutTag /> : null}
       </div>
     );
   };
@@ -59,7 +65,7 @@ function MediaBadge(handle: Handle<MediaBadgeProps>) {
     return (
       <span
         class={cn(
-          "absolute top-3 left-3 rounded px-2 py-1 text-[9px] font-bold tracking-[0.07em] uppercase backdrop-blur-sm",
+          "absolute top-3 left-3 rounded-full px-3 py-1.5 text-[10px] font-medium tracking-[0.12em] whitespace-nowrap uppercase backdrop-blur-md",
           badge.class,
         )}
       >
@@ -71,7 +77,7 @@ function MediaBadge(handle: Handle<MediaBadgeProps>) {
 
 function SoldOutTag() {
   return () => (
-    <span class="absolute right-3 bottom-3 rounded bg-white/95 px-2 py-1 text-[10px] text-stone-500">
+    <span class="absolute inset-x-4 bottom-4 rounded-full bg-paper/90 py-2 text-center text-xs text-stone-600 backdrop-blur-md">
       Temporarily sold out
     </span>
   );

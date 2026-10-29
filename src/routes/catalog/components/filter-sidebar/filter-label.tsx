@@ -2,7 +2,7 @@ import type { Handle, RemixNode } from "remix/component";
 import { cn } from "@/lib/utils";
 
 const labelClass =
-  "text-[11px] font-bold tracking-[0.12em] text-stone-700 uppercase";
+  "text-[11px] font-medium tracking-[0.18em] text-stone-500 uppercase";
 
 interface FilterLabelProps {
   for: string;
@@ -11,7 +11,7 @@ interface FilterLabelProps {
 
 export function FilterLabel(handle: Handle<FilterLabelProps>) {
   return () => (
-    <label for={handle.props.for} class={cn("mb-2 block", labelClass)}>
+    <label for={handle.props.for} class={cn("mb-3 block", labelClass)}>
       {handle.props.children}
     </label>
   );
@@ -23,7 +23,7 @@ interface FilterLegendProps {
 
 export function FilterLegend(handle: Handle<FilterLegendProps>) {
   return () => (
-    <legend class={cn("float-left mb-3 w-full", labelClass)}>
+    <legend class={cn("float-left mb-4 w-full", labelClass)}>
       {handle.props.children}
     </legend>
   );

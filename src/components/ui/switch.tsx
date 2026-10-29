@@ -11,7 +11,7 @@ export function Switch(handle: Handle<Props>) {
   return () => (
     <input
       type="checkbox"
-      class="h-5 w-9 cursor-pointer appearance-none rounded-full bg-stone-200 p-0.5 transition-colors before:block before:size-4 before:rounded-full before:bg-white before:shadow-sm before:transition-transform checked:bg-emerald-800 checked:before:translate-x-4 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-emerald-700"
+      class="h-6 w-10.5 shrink-0 cursor-pointer appearance-none rounded-full bg-stone-300/70 p-0.5 transition-colors before:block before:size-5 before:rounded-full before:bg-paper before:shadow-sm before:shadow-stone-900/20 before:transition-transform checked:bg-forest checked:before:translate-x-4.5 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-forest"
       mix={toggle({
         checked: handle.props.checked,
         name: handle.props.name,

@@ -1,4 +1,5 @@
 import type { Handle } from "remix/component";
+import { cn } from "@/lib/utils";
 import type { ProductSummary } from "@/db/types";
 
 const currency = new Intl.NumberFormat("en-US", {
@@ -15,16 +16,23 @@ interface Props {
 
 export function ProductPrice(handle: Handle<Props>) {
   return () => (
-    <div class="flex items-baseline gap-2">
-      <span class="text-[17px] font-semibold tracking-tight text-ink">
+    <div class="flex items-baseline gap-2 tabular-nums">
+      <span
+        class={cn(
+          "text-base font-medium",
+          handle.props.originalPrice ? "text-clay" : "text-ink",
+        )}
+      >
         {currency.format(handle.props.price)}
       </span>
       {handle.props.originalPrice ? (
-        <span class="text-xs text-stone-400 line-through">
+        <span class="text-[13px] text-stone-400 line-through decoration-stone-400/70">
           {currency.format(handle.props.originalPrice)}
         </span>
       ) : null}
-      <span class="text-[9px] text-stone-400">{handle.props.currency}</span>
+      <span class="text-[10px] tracking-wider text-stone-400">
+        {handle.props.currency}
+      </span>
     </div>
   );
 }

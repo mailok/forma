@@ -11,7 +11,7 @@ export function ResultsPagination(handle: Handle) {
     if (!searchResults.items.length) return null;
 
     return (
-      <div class="flex flex-col items-center gap-4 pt-9 pb-3">
+      <div class="flex flex-col items-center gap-5 pt-20 pb-4">
         <DiscoveryProgress
           shown={searchResults.items.length}
           total={searchResults.total}
@@ -39,9 +39,10 @@ function DiscoveryProgress(handle: Handle<DiscoveryProgressProps>) {
 
     return (
       <>
-        <p class="text-[11px] text-stone-400">
+        <p class="text-[13px] text-stone-500">
           You have discovered{" "}
-          <span class="font-medium text-stone-600">{shown}</span> of {total}{" "}
+          <span class="font-medium text-ink tabular-nums">{shown}</span> of{" "}
+          <span class="tabular-nums">{total}</span>{" "}
           {total === 1 ? "product" : "products"}
         </p>
         <ProgressBar value={Math.min(100, (shown / total) * 100)} />
@@ -56,9 +57,9 @@ interface ProgressBarProps {
 
 function ProgressBar(handle: Handle<ProgressBarProps>) {
   return () => (
-    <div class="h-0.5 w-36 overflow-hidden rounded-full bg-stone-200">
+    <div class="h-0.5 w-48 overflow-hidden rounded-full bg-line">
       <div
-        class="h-full rounded-full bg-[#8da77f] transition-all"
+        class="h-full rounded-full bg-ink transition-[width] duration-500"
         style={{ width: `${handle.props.value}%` }}
       />
     </div>
@@ -77,7 +78,7 @@ function LoadMoreButton(handle: Handle<LoadMoreButtonProps>) {
       disabled={handle.props.disabled}
       variant="outline"
       size="lg"
-      class="mt-1"
+      class="mt-2"
       mix={on("click", () => handle.props.onLoadMore())}
     >
       {handle.props.loading ? (
