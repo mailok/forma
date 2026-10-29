@@ -1,10 +1,11 @@
-import type { Handle } from "remix/component";
+import type { Handle, RemixNode } from "remix/component";
 import { cn } from "@/lib/utils";
+import { paths } from "@/lib/paths";
+import { ProductMetadata } from "@/components/product/product-metadata";
+import { ProductPrice } from "@/components/product/product-price";
+import { ProductColors } from "@/components/product/product-colors";
 import type { ProductSummary } from "@/db/types";
 import type { ProductView } from "@/routes/catalog/types";
-import { ProductMetadata } from "./product-metadata";
-import { ProductPrice } from "./product-price";
-import { ProductColors } from "./product-colors";
 import { ProductAvailability } from "./product-availability";
 
 const detailsLayouts: Record<ProductView, string> = {
@@ -29,7 +30,7 @@ export function ProductDetails(handle: Handle<Props>) {
           reviews={product.reviews}
         />
         <h3 class="mt-2 text-lg leading-tight font-semibold tracking-[-0.015em] text-ink">
-          {product.name}
+          <ProductLink slug={product.slug}>{product.name}</ProductLink>
         </h3>
         <p class="mt-1.5 truncate text-[13px] text-stone-500">
           {product.title}
@@ -46,4 +47,21 @@ export function ProductDetails(handle: Handle<Props>) {
       </div>
     );
   };
+}
+
+interface ProductLinkProps {
+  slug: string;
+  children?: RemixNode;
+}
+
+// The link's overlay covers the whole card, which must be its positioned ancestor.
+function ProductLink(handle: Handle<ProductLinkProps>) {
+  return () => (
+    <a
+      href={paths.product(handle.props.slug)}
+      class="after:absolute after:inset-0 after:rounded-[28px] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-forest/40 focus-visible:after:ring-offset-4 focus-visible:after:ring-offset-canvas"
+    >
+      {handle.props.children}
+    </a>
+  );
 }

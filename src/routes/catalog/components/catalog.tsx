@@ -64,7 +64,6 @@ export interface CatalogContextProps {
 function CatalogProvider(handle: Handle<CatalogContextProps, CatalogContext>) {
   let debounce: ReturnType<typeof setTimeout> | undefined;
   let displayedSearchResults = handle.props.initialSearchResults;
-  let syncedSearch = "";
 
   const searchQuery = createInfiniteQuery(handle, {
     ...catalogQueries.search(handle.props.initialSearchResults.filters),
@@ -122,15 +121,14 @@ function CatalogProvider(handle: Handle<CatalogContextProps, CatalogContext>) {
     void handle.update();
   }
 
+  // Astro's router keeps its own copy of the last URL it navigated to, and this
+  // replaceState does not update it. A history entry pushed by an in-page link
+  // would later compare against that stale URL and skip the reload, so in-page
+  // links in the catalog use data-astro-history="replace".
   function syncUrl() {
     const url = new URL(window.location.href);
     url.search = searchProductsFiltersToParams(state.filters, false).toString();
     window.history.replaceState(window.history.state, "", url);
-    syncedSearch = url.search;
-  }
-
-  function reloadOnFiltersNavigation() {
-    if (window.location.search !== syncedSearch) window.location.reload();
   }
 
   const context: CatalogContext = {
@@ -182,15 +180,6 @@ function CatalogProvider(handle: Handle<CatalogContextProps, CatalogContext>) {
     },
   };
   handle.context.set(context);
-
-  // queueTask only runs in the browser. Hash links also fire popstate, so only
-  // a different query string means the filters changed.
-  handle.queueTask(() => {
-    syncedSearch = window.location.search;
-    window.addEventListener("popstate", reloadOnFiltersNavigation, {
-      signal: handle.signal,
-    });
-  });
 
   return () => {
     // Keep the displayed selection if a new query fails without cached data.

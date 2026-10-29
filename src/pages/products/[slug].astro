@@ -1,0 +1,12 @@
+---
+import DocumentLayout from "@/layouts/document-layout.astro";
+import ProductPage from "@/routes/product/page";
+import { db } from "@/db/client";
+
+const product = db.products.findUnique(Astro.params.slug ?? "");
+if (!product) return new Response("Product not found.", { status: 404 });
+---
+
+<DocumentLayout title={`${product.name} — Forma`} description={product.title}>
+  <ProductPage client:load initialProduct={product} />
+</DocumentLayout>

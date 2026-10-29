@@ -79,3 +79,7 @@ export const filterOptionLabels: Record<FilterKey, Record<string, string>> = {
     priceRanges.map((range) => [range.value, range.label]),
   ),
 };
+
+export function filterOptionLabel(key: FilterKey, value: string): string {
+  return filterOptionLabels[key][value] ?? value;
+}

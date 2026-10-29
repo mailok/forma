@@ -20,7 +20,7 @@ export function ProductCard(handle: Handle<Props>) {
   return () => (
     <article
       data-product-id={handle.props.product.id}
-      class={cn("group cursor-pointer", layouts[handle.props.view])}
+      class={cn("group relative", layouts[handle.props.view])}
     >
       <ProductMedia
         product={handle.props.product}

@@ -43,7 +43,7 @@ function HeroIntro(handle: Handle<HeroIntroProps>) {
         </p>
         <h1
           id="catalog-heading"
-          class="font-display text-[52px] leading-[0.92] tracking-[-0.025em] text-ink sm:text-[72px] xl:text-[88px]"
+          class="font-display text-[52px] leading-[0.92] tracking-tight text-ink sm:text-[72px] xl:text-[88px]"
         >
           Good objects,
           <br />
@@ -68,6 +68,7 @@ function HeroCallToAction() {
   return () => (
     <a
       href="#catalog"
+      data-astro-history="replace"
       class="group inline-flex h-12 items-center gap-2.5 rounded-full bg-ink px-7 text-sm font-medium text-paper transition-colors hover:bg-forest focus-visible:ring-2 focus-visible:ring-forest/40 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas focus-visible:outline-none"
     >
       Explore the collection

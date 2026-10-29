@@ -1,18 +1,5 @@
 import type { Handle } from "remix/component";
-import { cn } from "@/lib/utils";
-
-type StockLevel = "out" | "low" | "available";
-
-interface StockStyle {
-  text: string;
-  dot: string;
-}
-
-const stockStyles: Record<StockLevel, StockStyle> = {
-  out: { text: "text-stone-400", dot: "bg-stone-300" },
-  low: { text: "text-clay", dot: "bg-clay" },
-  available: { text: "text-forest", dot: "bg-forest/70" },
-};
+import { StockStatus } from "@/components/product/stock-status";
 
 interface Props {
   stock: number;
@@ -20,23 +7,12 @@ interface Props {
 }
 
 export function ProductAvailability(handle: Handle<Props>) {
-  return () => {
-    const { stock, sku } = handle.props;
-    const styles = stockStyles[stockLevel(stock)];
-
-    return (
-      <div class="mt-4 flex items-center justify-between border-t border-line pt-3.5">
-        <span class={cn("flex items-center gap-2 text-xs", styles.text)}>
-          <span class={cn("size-1.5 rounded-full", styles.dot)} />
-          {stock === 0 ? "Out of stock" : `${stock} in stock`}
-        </span>
-        <span class="text-[10px] tracking-[0.12em] text-stone-400">{sku}</span>
-      </div>
-    );
-  };
-}
-
-function stockLevel(stock: number): StockLevel {
-  if (stock === 0) return "out";
-  return stock < 10 ? "low" : "available";
+  return () => (
+    <div class="mt-4 flex items-center justify-between border-t border-line pt-3.5">
+      <StockStatus stock={handle.props.stock} />
+      <span class="text-[10px] tracking-[0.12em] text-stone-400">
+        {handle.props.sku}
+      </span>
+    </div>
+  );
 }

@@ -1,5 +1,5 @@
 ---
-import "@/styles/global.css";
+import DocumentLayout from "@/layouts/document-layout.astro";
 import CatalogPage from "@/routes/catalog/page";
 import { db } from "@/db/client";
 import {
@@ -8,7 +8,6 @@ import {
 } from "@/pages/api/_lib/parse-search-products-filters";
 import type { SearchProductsResult } from "@/db/types";
 
-// Astro owns only the document shell. All visible content belongs to Remix.
 let initialSearchResults: SearchProductsResult;
 try {
   const filters = parseSearchProductsFilters(
@@ -23,25 +22,13 @@ try {
 const categories = db.categories.findMany();
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <meta
-      name="description"
-      content="Forma: a thoughtful selection of technology, design and everyday essentials. A demo built with Astro and Remix 3 components."
-    />
-    <meta name="theme-color" content="#f4f1ea" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>Forma — Thoughtfully chosen objects</title>
-  </head>
-  <body>
-    <CatalogPage
-      client:load
-      initialSearchResults={initialSearchResults}
-      categories={categories}
-    />
-  </body>
-</html>
+<DocumentLayout
+  title="Forma — Thoughtfully chosen objects"
+  description="Forma: a thoughtful selection of technology, design and everyday essentials. A demo built with Astro and Remix 3 components."
+>
+  <CatalogPage
+    client:load
+    initialSearchResults={initialSearchResults}
+    categories={categories}
+  />
+</DocumentLayout>

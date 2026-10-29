@@ -3,7 +3,7 @@ import { categoryIds, filterKeys } from "./catalog-options";
 import {
   categoryCopy,
   filterGroupLabels,
-  filterOptionLabels,
+  filterOptionLabel,
 } from "./catalog-labels";
 import { priceRangeOf, priceRanges } from "./price-ranges";
 import type {
@@ -65,7 +65,7 @@ function listFilterValues(key: FilterKey, category: CategoryId): string[] {
     productFilterValues(product, key),
   );
   return [...new Set(values)].sort((a, b) =>
-    optionLabel(key, a).localeCompare(optionLabel(key, b), "en"),
+    filterOptionLabel(key, a).localeCompare(filterOptionLabel(key, b), "en"),
   );
 }
 
@@ -95,7 +95,7 @@ function buildFacets(filters: SearchProductsFilters): FilterGroup[] {
     label: filterGroupLabels[key],
     options: listFilterValues(key, filters.category).map((value) => ({
       value,
-      label: optionLabel(key, value),
+      label: filterOptionLabel(key, value),
       count: countMatches({ ...filters, [key]: [value] }),
     })),
   }));
@@ -123,7 +123,7 @@ function matches(product: Product, filters: SearchProductsFilters): boolean {
 function matchesQuery(product: Product, q: string): boolean {
   const words = normalizeForSearch(q).split(/\s+/).filter(Boolean);
   const text = normalizeForSearch(
-    `${product.name} ${product.title} ${optionLabel("brand", product.brand)}`,
+    `${product.name} ${product.title} ${filterOptionLabel("brand", product.brand)}`,
   );
   return words.every((word) => text.includes(word));
 }
@@ -152,10 +152,6 @@ function productsIn(category: CategoryId): Product[] {
 
 function inCategory(product: Product, category: CategoryId): boolean {
   return category === "all" || product.category === category;
-}
-
-function optionLabel(key: FilterKey, value: string): string {
-  return filterOptionLabels[key][value] ?? value;
 }
 
 function normalizeForSearch(value: string): string {

@@ -1,4 +1,4 @@
-import { BrandMark, Icon } from "@/components/icon";
+import { BrandMark } from "@/components/icon";
 import { Container } from "@/components/layout/container";
 
 export function DemoFooter() {
@@ -9,7 +9,6 @@ export function DemoFooter() {
           <FooterBrand />
           <FooterDisclaimer />
         </div>
-        <BehindTheDemo />
       </Container>
     </footer>
   );
@@ -36,64 +35,5 @@ function FooterDisclaimer() {
     <p class="text-xs tracking-wide text-stone-400">
       Fictional catalog · Prices in USD · Illustrative photos
     </p>
-  );
-}
-
-function BehindTheDemo() {
-  return () => (
-    <details class="group mt-14 rounded-3xl border border-line bg-canvas/60">
-      <summary class="flex cursor-pointer list-none items-center gap-3 px-6 py-5 text-sm text-stone-600 marker:hidden">
-        <Icon name="info" class="size-4.5 text-forest" />
-        <span class="flex-1">
-          Behind the demo: composition, context and Astro
-        </span>
-        <span class="hidden text-[11px] tracking-[0.18em] text-stone-400 uppercase sm:inline">
-          For the curious
-        </span>
-        <Icon
-          name="chevron"
-          class="size-4 text-stone-400 transition-transform group-open:rotate-180"
-        />
-      </summary>
-      <div class="grid gap-8 border-t border-line p-6 text-[13px] leading-relaxed text-stone-500 md:grid-cols-2">
-        <DemoExplanation />
-        <ContextCodeSample />
-      </div>
-    </details>
-  );
-}
-
-function DemoExplanation() {
-  return () => (
-    <div>
-      <h2 class="mb-3 text-base font-semibold tracking-[-0.01em] text-ink">
-        One page. One context. Many components.
-      </h2>
-      <p>
-        Everything you see is a tree of Remix components, hydrated with{" "}
-        <code class="rounded bg-forest-soft px-1.5 py-0.5 text-xs text-forest">
-          client:load
-        </code>
-        . Search, filters and results share one context; state does not need to
-        pass through every component.
-      </p>
-      <p class="mt-3">
-        Astro serves categories and products from a JSON database. Each filter
-        sends an HTTP request with Wretch, with a short simulated delay and
-        cancellation of previous requests.
-      </p>
-    </div>
-  );
-}
-
-function ContextCodeSample() {
-  return () => (
-    <pre class="overflow-x-auto rounded-2xl bg-ink p-5 text-xs leading-loose text-paper/80">
-      <code>
-        {
-          "// catalog.Context\nhandle.context.set({ state, search, toggleFilter, … });\n\n// Any descendant component\nconst context = handle.context.get(catalog.Context);"
-        }
-      </code>
-    </pre>
   );
 }

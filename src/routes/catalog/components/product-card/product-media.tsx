@@ -1,17 +1,9 @@
 import type { Handle } from "remix/component";
 import { cn } from "@/lib/utils";
-import type { ProductBadge, ProductSummary } from "@/db/types";
+import { productImageTransitionName } from "@/lib/view-transitions";
+import { ProductBadgeTag } from "@/components/product/product-badge-tag";
+import type { ProductSummary } from "@/db/types";
 import type { ProductView } from "@/routes/catalog/types";
-
-interface BadgeStyle {
-  label: string;
-  class: string;
-}
-
-const badges: Record<ProductBadge, BadgeStyle> = {
-  new: { label: "New arrival", class: "bg-paper/90 text-ink" },
-  favorite: { label: "House favorite", class: "bg-clay/90 text-paper" },
-};
 
 const mediaShapes: Record<ProductView, string> = {
   grid: "aspect-4/5 rounded-[28px]",
@@ -35,6 +27,7 @@ export function ProductMedia(handle: Handle<ProductMediaProps>) {
           "relative overflow-hidden bg-stone-200/60",
           mediaShapes[view],
         )}
+        style={{ viewTransitionName: productImageTransitionName(product.slug) }}
       >
         <img
           src={product.image}
@@ -47,30 +40,14 @@ export function ProductMedia(handle: Handle<ProductMediaProps>) {
             soldOut && "opacity-80 grayscale-[0.6]",
           )}
         />
-        {product.badge ? <MediaBadge badge={product.badge} /> : null}
+        {product.badge ? (
+          <ProductBadgeTag
+            badge={product.badge}
+            class="absolute top-3 left-3"
+          />
+        ) : null}
         {soldOut && view === "grid" ? <SoldOutTag /> : null}
       </div>
-    );
-  };
-}
-
-interface MediaBadgeProps {
-  badge: ProductBadge;
-}
-
-function MediaBadge(handle: Handle<MediaBadgeProps>) {
-  return () => {
-    const badge = badges[handle.props.badge];
-
-    return (
-      <span
-        class={cn(
-          "absolute top-3 left-3 rounded-full px-3 py-1.5 text-[10px] font-medium tracking-[0.12em] whitespace-nowrap uppercase backdrop-blur-md",
-          badge.class,
-        )}
-      >
-        {badge.label}
-      </span>
     );
   };
 }
