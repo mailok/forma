@@ -1,11 +1,13 @@
+import type { InfiniteQueryObserverResult } from "@tanstack/query-core";
 import type { Handle, RemixNode } from "remix/component";
+import { createInfiniteQuery } from "@/integrations/tanstack-query/create-infinite-query";
 import { searchQueryMaxLength } from "@/db/catalog-options";
 import { defaultSearchProductsFilters } from "@/db/default-search-products-filters";
 import {
   countSearchProductsFilters,
   searchProductsFiltersToParams,
 } from "@/routes/catalog/search-products-filters";
-import { searchProducts } from "@/routes/catalog/queries/search-products";
+import { catalogQueries } from "@/routes/catalog/queries";
 import type { ProductView } from "@/routes/catalog/types";
 import type {
   Category,
@@ -48,7 +50,6 @@ interface CatalogContext {
 }
 
 interface SearchRequest {
-  append?: boolean;
   debounceMs?: number;
 }
 
@@ -61,18 +62,37 @@ export interface CatalogContextProps {
 /** A single Remix context owns the catalog. Descendants use get(catalog.Context),
  * not a chain of filter props. Context writes are paired with an explicit update. */
 function CatalogProvider(handle: Handle<CatalogContextProps, CatalogContext>) {
+  let debounce: ReturnType<typeof setTimeout> | undefined;
+  let displayedSearchResults = handle.props.initialSearchResults;
+  let syncedSearch = "";
+
+  const searchQuery = createInfiniteQuery(handle, {
+    ...catalogQueries.search(handle.props.initialSearchResults.filters),
+    initialData: {
+      pages: [handle.props.initialSearchResults],
+      pageParams: [1],
+    },
+  });
+
   const state: CatalogState = {
     filters: { ...handle.props.initialSearchResults.filters },
-    searchResults: handle.props.initialSearchResults,
-    status: "idle",
-    error: null,
+    get searchResults() {
+      return searchQuery.getCurrentResult().data ?? displayedSearchResults;
+    },
+    get status() {
+      const result = searchQuery.getCurrentResult();
+      if (debounce !== undefined) return "loading";
+      if (result.isFetchingNextPage) return "loading-more";
+      return isLoadingSelection(result) ? "loading" : "idle";
+    },
+    get error() {
+      return debounce === undefined
+        ? (searchQuery.getCurrentResult().error?.message ?? null)
+        : null;
+    },
     mobileFilters: false,
     view: "grid",
   };
-  let controller: AbortController | undefined;
-  let debounce: ReturnType<typeof setTimeout> | undefined;
-  let lastRequest: SearchRequest = {};
-  let syncedSearch = "";
 
   handle.signal.addEventListener("abort", () => clearTimeout(debounce), {
     once: true,
@@ -83,48 +103,23 @@ function CatalogProvider(handle: Handle<CatalogContextProps, CatalogContext>) {
     requestProductSearch(request);
   }
 
-  function requestProductSearch({
-    append = false,
-    debounceMs = 0,
-  }: SearchRequest = {}) {
+  function requestProductSearch({ debounceMs = 0 }: SearchRequest = {}) {
     clearTimeout(debounce);
-    controller?.abort();
-    controller = new AbortController();
-    lastRequest = { append };
+    debounce = undefined;
 
-    const signal = AbortSignal.any([controller.signal, handle.signal]);
-    const filters = {
-      ...state.filters,
-      page: append ? state.searchResults.page + 1 : 1,
-    };
-
-    state.status = append ? "loading-more" : "loading";
-    state.error = null;
-    void handle.update();
+    searchQuery.setOptions({
+      ...catalogQueries.search(state.filters),
+      enabled: debounceMs === 0,
+    });
+    if (debounceMs) debounce = setTimeout(runProductSearch, debounceMs);
     syncUrl();
+    void handle.update();
+  }
 
-    async function runProductSearch() {
-      try {
-        const results = await searchProducts({ filters, signal });
-        if (signal.aborted) return;
-        state.searchResults = append
-          ? appendSearchResults(state.searchResults, results)
-          : results;
-      } catch (error) {
-        if (signal.aborted) return;
-        state.error =
-          error instanceof Error
-            ? error.message
-            : "Unable to connect to the catalog.";
-      }
-      state.status = "idle";
-      void handle.update();
-    }
-
-    // Pending state is immediate; only the search request is debounced.
-    if (debounceMs)
-      debounce = setTimeout(() => void runProductSearch(), debounceMs);
-    else void runProductSearch();
+  function runProductSearch() {
+    debounce = undefined;
+    searchQuery.setOptions(catalogQueries.search(state.filters));
+    void handle.update();
   }
 
   function syncUrl() {
@@ -167,11 +162,15 @@ function CatalogProvider(handle: Handle<CatalogContextProps, CatalogContext>) {
       requestProductSearch();
     },
     loadMore() {
-      if (state.status === "idle" && state.searchResults.hasMore)
-        requestProductSearch({ append: true });
+      if (state.status === "idle" && searchQuery.getCurrentResult().hasNextPage)
+        void searchQuery.fetchNextPage();
     },
     retry() {
-      requestProductSearch(lastRequest);
+      if (searchQuery.getCurrentResult().isFetchNextPageError) {
+        void searchQuery.fetchNextPage();
+      } else {
+        void searchQuery.refetch();
+      }
     },
     toggleMobileFilters() {
       state.mobileFilters = !state.mobileFilters;
@@ -193,7 +192,11 @@ function CatalogProvider(handle: Handle<CatalogContextProps, CatalogContext>) {
     });
   });
 
-  return () => handle.props.children;
+  return () => {
+    // Keep the displayed selection if a new query fails without cached data.
+    displayedSearchResults = state.searchResults;
+    return handle.props.children;
+  };
 }
 
 export const Context = CatalogProvider;
@@ -202,15 +205,15 @@ export function activeFilterCount(context: CatalogContext): number {
   return countSearchProductsFilters(context.state.filters);
 }
 
+// Placeholder data reports success, so a refetch over current results stays silent.
+function isLoadingSelection(
+  result: InfiniteQueryObserverResult<SearchProductsResult>,
+): boolean {
+  return result.isFetching && (result.isPlaceholderData || !result.isSuccess);
+}
+
 function toggleValue(values: string[], value: string): string[] {
   return values.includes(value)
     ? values.filter((current) => current !== value)
     : [...values, value];
-}
-
-function appendSearchResults(
-  current: SearchProductsResult,
-  next: SearchProductsResult,
-): SearchProductsResult {
-  return { ...next, items: [...current.items, ...next.items] };
 }

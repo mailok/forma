@@ -18,6 +18,11 @@ The demo will be deployed on **Vercel**.
 
 Astro handles routing and server endpoints. Remix is used only for its component model, not its backend or router.
 
-## Planned exploration
+## Tech stack
 
-- [ ] **TanStack Query integration** — explore data fetching, caching and server-state management with Remix components. **Not integrated yet.**
+- **Astro** — routing, server endpoints and server rendering.
+- **Remix 3** — interactive UI components.
+- **TanStack Query** (`@tanstack/query-core`) — server-state management and caching.
+- **Tailwind CSS** — styling.
+- **Wretch** — HTTP requests.
+- **TypeScript** — static typing.
