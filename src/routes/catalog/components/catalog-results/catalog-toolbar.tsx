@@ -1,0 +1,145 @@
+import { on, type Handle, type RemixNode } from "remix/component";
+import * as catalog from "@/routes/catalog/components/catalog";
+import { Icon, type IconName } from "@/components/icon";
+import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select/select";
+import type { SelectOption } from "@/components/ui/select/types";
+import type { SortOrder } from "@/db/types";
+import type { ProductView } from "@/routes/catalog/types";
+
+const sortOptions: SelectOption[] = [
+  { value: "featured", label: "Our selection" },
+  { value: "price-asc", label: "Price: low to high" },
+  { value: "price-desc", label: "Price: high to low" },
+  { value: "name", label: "Name: A to Z" },
+];
+
+interface ViewOption {
+  value: ProductView;
+  label: string;
+  icon: IconName;
+}
+
+const viewOptions: ViewOption[] = [
+  { value: "grid", label: "Grid view", icon: "grid" },
+  { value: "list", label: "List view", icon: "list" },
+];
+
+export function CatalogToolbar() {
+  return () => (
+    <div class="flex flex-wrap items-center justify-between gap-3 py-5">
+      <ToolbarGroup>
+        <ResultCount />
+        <FiltersToggle />
+      </ToolbarGroup>
+      <ToolbarGroup>
+        <SortSelect />
+        <ViewToggle />
+      </ToolbarGroup>
+    </div>
+  );
+}
+
+interface ToolbarGroupProps {
+  children?: RemixNode;
+}
+
+function ToolbarGroup(handle: Handle<ToolbarGroupProps>) {
+  return () => (
+    <div class="flex items-center gap-3">{handle.props.children}</div>
+  );
+}
+
+function ResultCount(handle: Handle) {
+  const context = handle.context.get(catalog.Context);
+
+  return () => {
+    const { status, searchResults } = context.state;
+
+    return (
+      <p role="status" aria-live="polite" class="text-xs text-stone-500">
+        {status === "loading" ? (
+          <span class="flex items-center gap-2 text-emerald-800">
+            <Icon name="spinner" class="size-3.5 animate-spin" />
+            Updating your selection…
+          </span>
+        ) : (
+          <>
+            <span class="font-semibold text-ink">{searchResults.total}</span>{" "}
+            {searchResults.total === 1
+              ? "product to discover"
+              : "products to discover"}
+          </>
+        )}
+      </p>
+    );
+  };
+}
+
+function FiltersToggle(handle: Handle) {
+  const context = handle.context.get(catalog.Context);
+
+  return () => {
+    const count = catalog.activeFilterCount(context);
+
+    return (
+      <Button
+        aria-controls="filters"
+        aria-expanded={context.state.mobileFilters}
+        variant="outline"
+        size="sm"
+        class="lg:hidden"
+        mix={on("click", () => context.toggleMobileFilters())}
+      >
+        <Icon name="sliders" class="size-3.5" />
+        Filters
+        {count ? ` (${count})` : ""}
+      </Button>
+    );
+  };
+}
+
+function SortSelect(handle: Handle) {
+  const context = handle.context.get(catalog.Context);
+
+  return () => (
+    <>
+      <label
+        for="product-sort"
+        class="hidden text-[11px] text-stone-400 sm:block"
+      >
+        Sort by
+      </label>
+      <Select
+        id="product-sort"
+        label="Sort products"
+        value={context.state.filters.sort}
+        variant="subtle"
+        class="w-44"
+        options={sortOptions}
+        onValueChange={(value) => context.sort(value as SortOrder)}
+      />
+    </>
+  );
+}
+
+function ViewToggle(handle: Handle) {
+  const context = handle.context.get(catalog.Context);
+
+  return () => (
+    <div class="flex gap-0.5 border-l border-stone-200 pl-3">
+      {viewOptions.map((option) => (
+        <Button
+          key={option.value}
+          aria-label={option.label}
+          aria-pressed={context.state.view === option.value}
+          variant="ghost"
+          size="icon-sm"
+          mix={on("click", () => context.setView(option.value))}
+        >
+          <Icon name={option.icon} class="size-3.5" />
+        </Button>
+      ))}
+    </div>
+  );
+}

@@ -1,0 +1,22 @@
+# Dependencies and generated output
+node_modules/
+dist/
+.astro/
+.cache/
+**/*.map
+
+# Package-manager generated files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+bun.lock
+bun.lockb
+
+# Downloaded product assets and their generated source manifest
+public/products/
+
+# Local environment, logs, and editor metadata
+.env*
+*.log
+.idea/
+.DS_Store

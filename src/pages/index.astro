@@ -1,16 +1,47 @@
 ---
+import "@/styles/global.css";
+import CatalogPage from "@/routes/catalog/page";
+import { db } from "@/db/client";
+import {
+  InvalidSearchProductsQuery,
+  parseSearchProductsFilters,
+} from "@/pages/api/_lib/parse-search-products-filters";
+import type { SearchProductsResult } from "@/db/types";
+
+// Astro owns only the document shell. All visible content belongs to Remix.
+let initialSearchResults: SearchProductsResult;
+try {
+  const filters = parseSearchProductsFilters(
+    Astro.url.searchParams,
+    db.products.filterValues,
+  );
+  initialSearchResults = db.products.search({ ...filters, page: 1 });
+} catch (error) {
+  if (error instanceof InvalidSearchProductsQuery) return Astro.redirect("/");
+  throw error;
+}
+const categories = db.categories.findMany();
 ---
 
+<!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta
+      name="description"
+      content="Forma: a thoughtful selection of technology, design and everyday essentials. A demo built with Astro and Remix 3 components."
+    />
+    <meta name="theme-color" content="#164d3a" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Forma — Thoughtfully chosen objects</title>
+  </head>
+  <body>
+    <CatalogPage
+      client:load
+      initialSearchResults={initialSearchResults}
+      categories={categories}
+    />
+  </body>
 </html>

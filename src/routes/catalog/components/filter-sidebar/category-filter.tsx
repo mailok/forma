@@ -1,0 +1,34 @@
+import type { Handle } from "remix/component";
+import * as catalog from "@/routes/catalog/components/catalog";
+import { Select } from "@/components/ui/select/select";
+import type { SelectOption } from "@/components/ui/select/types";
+import type { Category, CategoryId } from "@/db/types";
+import { FilterLabel } from "./filter-label";
+
+export function CategoryFilter(handle: Handle) {
+  const context = handle.context.get(catalog.Context);
+
+  return () => (
+    <>
+      <FilterLabel for="category-select">Category</FilterLabel>
+      <Select
+        id="category-select"
+        name="category"
+        label="Category"
+        value={context.state.filters.category}
+        class="mb-5"
+        options={context.categories.map(toCategoryOption)}
+        onValueChange={(value) => context.selectCategory(value as CategoryId)}
+      />
+    </>
+  );
+}
+
+function toCategoryOption(category: Category): SelectOption {
+  return {
+    value: category.id,
+    label: category.label,
+    description: category.description,
+    meta: String(category.count),
+  };
+}
