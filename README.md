@@ -4,9 +4,9 @@ Forma is an experimental project for exploring the **Remix 3 component model ins
 
 ## Demo
 
-The demo will be deployed on **Vercel**.
+The demo is deployed on **Vercel**.
 
-**Demo URL:** `<add-vercel-deployment-url>`
+**Demo URL:** [Forma live demo](https://forma-one-psi.vercel.app/)
 
 ## Purpose
 
