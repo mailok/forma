@@ -6,18 +6,19 @@ import type { FilterGroup, FilterOption } from "@/db/types";
 import { FilterLegend } from "./filter-label";
 
 export function FilterFacets(handle: Handle) {
-  const context = handle.context.get(catalog.Context);
+  const { search } = handle.context.get(catalog.Context);
+  search.updateOn(handle, ["filterschange", "resultschange", "errorchange"]);
 
   return () => {
-    const { filters, searchResults, error } = context.state;
+    const { filters, searchResults } = search;
 
-    if (searchResults.filters.category !== filters.category) {
+    if (!search.facetsMatchCategory) {
       return (
         <p
           role="status"
           class="border-t border-line py-7 text-[13px] text-stone-400"
         >
-          {error ? "Retry to load the filters." : "Preparing filters…"}
+          {search.error ? "Retry to load the filters." : "Preparing filters…"}
         </p>
       );
     }
@@ -28,6 +29,8 @@ export function FilterFacets(handle: Handle) {
           <FilterSection
             key={`${searchResults.filters.category}-${group.key}`}
             group={group}
+            selectedValues={filters[group.key]}
+            onToggle={(value) => search.toggleFilter(group.key, value)}
           />
         ))}
       </>
@@ -37,6 +40,8 @@ export function FilterFacets(handle: Handle) {
 
 interface FilterSectionProps {
   group: FilterGroup;
+  selectedValues: string[];
+  onToggle(value: string): void;
 }
 
 function FilterSection(handle: Handle<FilterSectionProps>) {
@@ -49,6 +54,8 @@ function FilterSection(handle: Handle<FilterSectionProps>) {
             key={option.value}
             group={handle.props.group}
             option={option}
+            checked={handle.props.selectedValues.includes(option.value)}
+            onToggle={() => handle.props.onToggle(option.value)}
           />
         ))}
       </div>
@@ -59,14 +66,13 @@ function FilterSection(handle: Handle<FilterSectionProps>) {
 interface FilterCheckboxProps {
   group: FilterGroup;
   option: FilterOption;
+  checked: boolean;
+  onToggle(): void;
 }
 
 function FilterCheckbox(handle: Handle<FilterCheckboxProps>) {
-  const context = handle.context.get(catalog.Context);
-
   return () => {
-    const { group, option } = handle.props;
-    const checked = context.state.filters[group.key].includes(option.value);
+    const { group, option, checked } = handle.props;
     const unavailable = option.count === 0 && !checked;
 
     return (
@@ -81,7 +87,7 @@ function FilterCheckbox(handle: Handle<FilterCheckboxProps>) {
           value={option.value}
           checked={checked}
           disabled={unavailable}
-          onCheckedChange={() => context.toggleFilter(group.key, option.value)}
+          onCheckedChange={() => handle.props.onToggle()}
         />
         <span class="flex-1">{option.label}</span>
         <span class="text-xs text-stone-400 tabular-nums">{option.count}</span>
@@ -107,6 +113,8 @@ function checkboxState({
   checked,
   unavailable,
 }: CheckboxStateInput): CheckboxState {
-  if (checked) return "checked";
+  if (checked) {
+    return "checked";
+  }
   return unavailable ? "unavailable" : "available";
 }

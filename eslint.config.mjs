@@ -11,6 +11,7 @@ export default defineConfig(
     "**/node_modules/**",
     "**/dist/**",
     "**/.astro/**",
+    "**/.vercel/**",
     "**/.cache/**",
     "public/products/**",
     "**/*.map",
@@ -54,4 +55,9 @@ export default defineConfig(
   },
   // Prettier owns formatting; ESLint owns code-quality checks.
   prettier,
+  {
+    name: "app/braces",
+    // eslint-config-prettier turns curly off; only the "all" option is Prettier-compatible.
+    rules: { curly: ["error", "all"] },
+  },
 );

@@ -60,7 +60,9 @@ function findProduct(idOrSlug: string): Product | undefined {
 }
 
 function listFilterValues(key: FilterKey, category: CategoryId): string[] {
-  if (key === "price") return priceRanges.map((range) => range.value);
+  if (key === "price") {
+    return priceRanges.map((range) => range.value);
+  }
   const values = productsIn(category).flatMap((product) =>
     productFilterValues(product, key),
   );
@@ -134,15 +136,21 @@ function matchesFilterGroups(
 ): boolean {
   return filterKeys.every((key) => {
     const selected = filters[key];
-    if (!selected.length) return true;
+    if (!selected.length) {
+      return true;
+    }
     const values = productFilterValues(product, key);
     return selected.some((value) => values.includes(value));
   });
 }
 
 function productFilterValues(product: Product, key: FilterKey): string[] {
-  if (key === "feature") return product.features;
-  if (key === "price") return [priceRangeOf(product.price)];
+  if (key === "feature") {
+    return product.features;
+  }
+  if (key === "price") {
+    return [priceRangeOf(product.price)];
+  }
   return [product[key]];
 }
 

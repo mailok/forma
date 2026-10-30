@@ -1,4 +1,4 @@
-import { CatalogSearch } from "./catalog-search";
+import { SearchField } from "./search-field";
 import { CatalogToolbar } from "./catalog-toolbar";
 import { ActiveFilters } from "./active-filters";
 import { ResultsError } from "./results-error";
@@ -8,7 +8,7 @@ import { ResultsPagination } from "./results-pagination";
 export function CatalogResults() {
   return () => (
     <section class="min-w-0" aria-label="Product selection">
-      <CatalogSearch />
+      <SearchField />
       <CatalogToolbar />
       <ActiveFilters />
       <ResultsError />

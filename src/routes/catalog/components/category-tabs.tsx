@@ -3,7 +3,8 @@ import type { Category } from "@/db/types";
 import * as catalog from "./catalog";
 
 export function CategoryTabs(handle: Handle) {
-  const context = handle.context.get(catalog.Context);
+  const { categories, search } = handle.context.get(catalog.Context);
+  search.updateOn(handle, ["categorychange"]);
 
   return () => (
     <nav
@@ -11,12 +12,12 @@ export function CategoryTabs(handle: Handle) {
       class="-mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0"
     >
       <div class="flex min-w-max gap-8 border-b border-line sm:gap-10">
-        {context.categories.map((category) => (
+        {categories.map((category) => (
           <CategoryTab
             key={category.id}
             category={category}
-            selected={context.state.filters.category === category.id}
-            onSelect={() => context.selectCategory(category.id)}
+            selected={search.filters.category === category.id}
+            onSelect={() => search.selectCategory(category.id)}
           />
         ))}
       </div>

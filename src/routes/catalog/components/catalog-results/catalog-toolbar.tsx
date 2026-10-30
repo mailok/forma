@@ -51,10 +51,11 @@ function ToolbarGroup(handle: Handle<ToolbarGroupProps>) {
 }
 
 function ResultCount(handle: Handle) {
-  const context = handle.context.get(catalog.Context);
+  const { search } = handle.context.get(catalog.Context);
+  search.updateOn(handle, ["statuschange", "resultschange"]);
 
   return () => {
-    const { status, searchResults } = context.state;
+    const { status, searchResults } = search;
 
     return (
       <p
@@ -83,19 +84,21 @@ function ResultCount(handle: Handle) {
 }
 
 function FiltersToggle(handle: Handle) {
-  const context = handle.context.get(catalog.Context);
+  const { search, ui } = handle.context.get(catalog.Context);
+  search.updateOn(handle, ["filterschange"]);
+  ui.updateOn(handle, ["mobilefilterschange"]);
 
   return () => {
-    const count = catalog.activeFilterCount(context);
+    const count = search.activeFilterCount;
 
     return (
       <Button
         aria-controls="filters"
-        aria-expanded={context.state.mobileFilters}
+        aria-expanded={ui.mobileFiltersOpen}
         variant="outline"
         size="sm"
         class="lg:hidden"
-        mix={on("click", () => context.toggleMobileFilters())}
+        mix={on("click", () => ui.toggleMobileFilters())}
       >
         <Icon name="sliders" class="size-4" />
         Filters
@@ -110,28 +113,33 @@ function FiltersToggle(handle: Handle) {
 }
 
 function SortSelect(handle: Handle) {
-  const context = handle.context.get(catalog.Context);
+  const { search } = handle.context.get(catalog.Context);
+  search.updateOn(handle, ["filterschange"]);
 
   return () => (
     <>
-      <label for="product-sort" class="hidden text-[13px] text-stone-400 sm:block">
+      <label
+        for="product-sort"
+        class="hidden text-[13px] text-stone-400 sm:block"
+      >
         Sort by
       </label>
       <Select
         id="product-sort"
         label="Sort products"
-        value={context.state.filters.sort}
+        value={search.filters.sort}
         variant="subtle"
         class="w-48"
         options={sortOptions}
-        onValueChange={(value) => context.sort(value as SortOrder)}
+        onValueChange={(value) => search.setSort(value as SortOrder)}
       />
     </>
   );
 }
 
 function ViewToggle(handle: Handle) {
-  const context = handle.context.get(catalog.Context);
+  const { ui } = handle.context.get(catalog.Context);
+  ui.updateOn(handle, ["viewchange"]);
 
   return () => (
     <div class="flex gap-0.5 rounded-full bg-ink/5 p-0.5">
@@ -139,10 +147,10 @@ function ViewToggle(handle: Handle) {
         <Button
           key={option.value}
           aria-label={option.label}
-          aria-pressed={context.state.view === option.value}
+          aria-pressed={ui.view === option.value}
           variant="ghost"
           size="icon-sm"
-          mix={on("click", () => context.setView(option.value))}
+          mix={on("click", () => ui.setView(option.value))}
         >
           <Icon name={option.icon} class="size-4" />
         </Button>

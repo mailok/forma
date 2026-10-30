@@ -5,10 +5,12 @@ import { ProductList } from "./product-list";
 import { EmptyResults } from "./empty-results";
 
 export function ProductResults(handle: Handle) {
-  const context = handle.context.get(catalog.Context);
+  const { search, ui } = handle.context.get(catalog.Context);
+  search.updateOn(handle, ["statuschange", "resultschange"]);
+  ui.updateOn(handle, ["viewchange"]);
 
   return () => {
-    const { status, searchResults, view } = context.state;
+    const { status, searchResults } = search;
 
     return (
       <div
@@ -19,9 +21,9 @@ export function ProductResults(handle: Handle) {
         )}
       >
         {searchResults.items.length ? (
-          <ProductList products={searchResults.items} view={view} />
+          <ProductList products={searchResults.items} view={ui.view} />
         ) : (
-          <EmptyResults onReset={() => context.reset()} />
+          <EmptyResults onReset={() => search.resetFilters()} />
         )}
       </div>
     );

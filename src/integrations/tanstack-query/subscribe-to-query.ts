@@ -15,7 +15,9 @@ export function subscribeToQuery(
 ) {
   // Subscribing can start a fetch, so wait until browser commit, never SSR.
   handle.queueTask(() => {
-    if (handle.signal.aborted) return;
+    if (handle.signal.aborted) {
+      return;
+    }
     const unsubscribe = observer.subscribe(() => void handle.update());
     handle.signal.addEventListener("abort", unsubscribe, { once: true });
     // Reconcile cache changes between setup and subscription.

@@ -33,6 +33,8 @@ export function StockStatus(handle: Handle<Props>) {
 }
 
 function stockLevel(stock: number): StockLevel {
-  if (stock === 0) return "out";
+  if (stock === 0) {
+    return "out";
+  }
   return stock < 10 ? "low" : "available";
 }

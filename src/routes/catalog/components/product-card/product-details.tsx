@@ -60,7 +60,7 @@ function ProductLink(handle: Handle<ProductLinkProps>) {
   return () => (
     <a
       href={paths.product(handle.props.slug)}
-      class="inline-flex items-center gap-2 after:absolute after:inset-0 after:rounded-[28px] group-data-pending:cursor-progress focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-forest/40 focus-visible:after:ring-offset-4 focus-visible:after:ring-offset-canvas"
+      class="inline-flex items-center gap-2 group-data-pending:cursor-progress after:absolute after:inset-0 after:rounded-[28px] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-forest/40 focus-visible:after:ring-offset-4 focus-visible:after:ring-offset-canvas"
     >
       {handle.props.children}
       <Icon

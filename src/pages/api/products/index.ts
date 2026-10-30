@@ -17,8 +17,9 @@ export const GET: APIRoute = async function searchProducts({ url }) {
       headers: { "Cache-Control": "no-store" },
     });
   } catch (error) {
-    if (error instanceof InvalidSearchProductsQuery)
+    if (error instanceof InvalidSearchProductsQuery) {
       return Response.json({ error: error.message }, { status: 400 });
+    }
     throw error;
   }
 };

@@ -6,7 +6,8 @@ import type { Category, CategoryId } from "@/db/types";
 import { FilterLabel } from "./filter-label";
 
 export function CategoryFilter(handle: Handle) {
-  const context = handle.context.get(catalog.Context);
+  const { categories, search } = handle.context.get(catalog.Context);
+  search.updateOn(handle, ["categorychange"]);
 
   return () => (
     <>
@@ -15,10 +16,10 @@ export function CategoryFilter(handle: Handle) {
         id="category-select"
         name="category"
         label="Category"
-        value={context.state.filters.category}
+        value={search.filters.category}
         class="mb-7"
-        options={context.categories.map(toCategoryOption)}
-        onValueChange={(value) => context.selectCategory(value as CategoryId)}
+        options={categories.map(toCategoryOption)}
+        onValueChange={(value) => search.selectCategory(value as CategoryId)}
       />
     </>
   );

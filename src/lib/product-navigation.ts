@@ -10,10 +10,16 @@ export function trackProductNavigation() {
   // Remix can replace the SSR cards while the destination is still loading.
   document.addEventListener("astro:hydrate", updatePendingCards, true);
 
-  function prepareNavigation(event: DocumentEventMap["astro:before-preparation"]) {
-    const card = event.sourceElement?.closest<HTMLElement>("[data-product-path]");
+  function prepareNavigation(
+    event: DocumentEventMap["astro:before-preparation"],
+  ) {
+    const card = event.sourceElement?.closest<HTMLElement>(
+      "[data-product-path]",
+    );
     const productPath = card?.dataset.productPath;
-    if (!productPath || event.to.pathname !== productPath) return;
+    if (!productPath || event.to.pathname !== productPath) {
+      return;
+    }
 
     const navigation: PendingProductNavigation = {
       path: productPath,
@@ -23,7 +29,9 @@ export function trackProductNavigation() {
     event.loader = loadProductPage;
 
     async function loadProductPage() {
-      if (event.signal.aborted) return;
+      if (event.signal.aborted) {
+        return;
+      }
       pendingNavigation = navigation;
       updatePendingCards();
       event.signal.addEventListener("abort", finishNavigation, { once: true });
@@ -37,7 +45,9 @@ export function trackProductNavigation() {
     }
 
     function finishNavigation() {
-      if (pendingNavigation?.signal !== event.signal) return;
+      if (pendingNavigation?.signal !== event.signal) {
+        return;
+      }
       pendingNavigation = undefined;
       updatePendingCards();
     }

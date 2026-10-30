@@ -3,7 +3,8 @@ import * as catalog from "@/routes/catalog/components/catalog";
 import { Switch } from "@/components/ui/switch";
 
 export function StockFilter(handle: Handle) {
-  const context = handle.context.get(catalog.Context);
+  const { search } = handle.context.get(catalog.Context);
+  search.updateOn(handle, ["filterschange"]);
 
   return () => (
     <div class="border-t border-line pt-7">
@@ -11,8 +12,8 @@ export function StockFilter(handle: Handle) {
         In stock only
         <Switch
           name="inStock"
-          checked={context.state.filters.inStock}
-          onCheckedChange={(checked) => context.setInStock(checked)}
+          checked={search.filters.inStock}
+          onCheckedChange={(checked) => search.setInStock(checked)}
         />
       </label>
     </div>

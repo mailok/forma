@@ -4,11 +4,14 @@ import { Icon } from "@/components/icon";
 import { Button } from "@/components/ui/button";
 
 export function ResultsPagination(handle: Handle) {
-  const context = handle.context.get(catalog.Context);
+  const { search } = handle.context.get(catalog.Context);
+  search.updateOn(handle, ["resultschange", "statuschange"]);
 
   return () => {
-    const { searchResults, status } = context.state;
-    if (!searchResults.items.length) return null;
+    const { searchResults, status } = search;
+    if (!searchResults.items.length) {
+      return null;
+    }
 
     return (
       <div class="flex flex-col items-center gap-5 pt-20 pb-4">
@@ -20,7 +23,7 @@ export function ResultsPagination(handle: Handle) {
           <LoadMoreButton
             loading={status === "loading-more"}
             disabled={status !== "idle"}
-            onLoadMore={() => context.loadMore()}
+            onLoadMore={() => search.loadMore()}
           />
         ) : null}
       </div>

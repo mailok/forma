@@ -6,18 +6,38 @@ export function searchProductsFiltersToParams(
   pagination = true,
 ): URLSearchParams {
   const params = new URLSearchParams();
-  if (filters.q) params.set("q", filters.q);
-  if (filters.category !== "all") params.set("category", filters.category);
-  for (const key of filterKeys) {
-    for (const value of filters[key]) params.append(key, value);
+  if (filters.q) {
+    params.set("q", filters.q);
   }
-  if (filters.inStock) params.set("inStock", "true");
-  if (filters.sort !== "featured") params.set("sort", filters.sort);
+  if (filters.category !== "all") {
+    params.set("category", filters.category);
+  }
+  for (const key of filterKeys) {
+    for (const value of filters[key]) {
+      params.append(key, value);
+    }
+  }
+  if (filters.inStock) {
+    params.set("inStock", "true");
+  }
+  if (filters.sort !== "featured") {
+    params.set("sort", filters.sort);
+  }
   if (pagination) {
     params.set("page", String(filters.page));
     params.set("limit", String(filters.limit));
   }
   return params;
+}
+
+export function hasActiveSearchProductsFilters(
+  filters: SearchProductsFilters,
+): boolean {
+  return (
+    countSearchProductsFilters(filters) > 0 ||
+    filters.q !== "" ||
+    filters.category !== "all"
+  );
 }
 
 export function countSearchProductsFilters(

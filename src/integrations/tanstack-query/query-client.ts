@@ -31,7 +31,9 @@ export const Context = QueryProvider;
 
 function getQueryContext(): QueryContext {
   // Server renders must never share a cache between requests.
-  if (typeof window === "undefined") return createQueryContext();
+  if (typeof window === "undefined") {
+    return createQueryContext();
+  }
   return (browserContext ??= createQueryContext());
 }
 

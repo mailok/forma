@@ -16,7 +16,9 @@ try {
   );
   initialSearchResults = db.products.search({ ...filters, page: 1 });
 } catch (error) {
-  if (error instanceof InvalidSearchProductsQuery) return Astro.redirect("/");
+  if (error instanceof InvalidSearchProductsQuery) {
+    return Astro.redirect("/");
+  }
   throw error;
 }
 const categories = db.categories.findMany();

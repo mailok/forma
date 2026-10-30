@@ -1,5 +1,6 @@
 import { on, type Handle } from "remix/component";
 import * as catalog from "@/routes/catalog/components/catalog";
+import { hasActiveSearchProductsFilters } from "@/routes/catalog/search-products-filters";
 import { Button } from "@/components/ui/button";
 import { RemovableBadge } from "@/components/ui/removable-badge";
 import { filterKeys } from "@/db/catalog-options";
@@ -12,24 +13,16 @@ interface SelectedFacet {
 }
 
 export function ActiveFilters(handle: Handle) {
-  const context = handle.context.get(catalog.Context);
-
-  function hasActiveFilters() {
-    const { filters } = context.state;
-    return (
-      catalog.activeFilterCount(context) > 0 ||
-      filters.q !== "" ||
-      filters.category !== "all"
-    );
-  }
+  const { categories, search } = handle.context.get(catalog.Context);
+  search.updateOn(handle, ["filterschange", "resultschange"]);
 
   function categoryLabel() {
-    const { category } = context.state.filters;
-    return context.categories.find((c) => c.id === category)?.label ?? category;
+    const { category } = search.filters;
+    return categories.find((c) => c.id === category)?.label ?? category;
   }
 
   function selectedFacets(): SelectedFacet[] {
-    const { filters, searchResults } = context.state;
+    const { filters, searchResults } = search;
     return filterKeys.flatMap((key) =>
       filters[key].map((value) => ({
         key,
@@ -43,8 +36,10 @@ export function ActiveFilters(handle: Handle) {
   }
 
   return () => {
-    if (!hasActiveFilters()) return null;
-    const { filters } = context.state;
+    if (!hasActiveSearchProductsFilters(search.filters)) {
+      return null;
+    }
+    const { filters } = search;
 
     return (
       <div
@@ -54,7 +49,7 @@ export function ActiveFilters(handle: Handle) {
         {filters.category !== "all" ? (
           <RemovableBadge
             removeLabel="Remove category filter"
-            onRemove={() => context.selectCategory("all")}
+            onRemove={() => search.selectCategory("all")}
           >
             {categoryLabel()}
           </RemovableBadge>
@@ -62,7 +57,7 @@ export function ActiveFilters(handle: Handle) {
         {filters.q ? (
           <RemovableBadge
             removeLabel="Clear search"
-            onRemove={() => context.clearSearch()}
+            onRemove={() => search.clearQuery()}
           >
             “{filters.q}”
           </RemovableBadge>
@@ -71,7 +66,7 @@ export function ActiveFilters(handle: Handle) {
           <RemovableBadge
             key={`${facet.key}-${facet.value}`}
             removeLabel={`Remove ${facet.label} filter`}
-            onRemove={() => context.toggleFilter(facet.key, facet.value)}
+            onRemove={() => search.toggleFilter(facet.key, facet.value)}
           >
             {facet.label}
           </RemovableBadge>
@@ -79,7 +74,7 @@ export function ActiveFilters(handle: Handle) {
         {filters.inStock ? (
           <RemovableBadge
             removeLabel="Remove in-stock filter"
-            onRemove={() => context.setInStock(false)}
+            onRemove={() => search.setInStock(false)}
           >
             In stock
           </RemovableBadge>
@@ -87,7 +82,7 @@ export function ActiveFilters(handle: Handle) {
         <Button
           variant="link"
           size="sm"
-          mix={on("click", () => context.reset())}
+          mix={on("click", () => search.resetFilters())}
         >
           Clear all
         </Button>

@@ -39,7 +39,9 @@ export function Select(handle: Handle<Props>) {
       <div
         class={cn("min-w-0", handle.props.class)}
         mix={select.onSelectChange((event) => {
-          if (event.value === null) return;
+          if (event.value === null) {
+            return;
+          }
           appliedValue = event.value;
           handle.props.onValueChange(event.value);
         })}
