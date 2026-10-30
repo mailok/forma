@@ -6,6 +6,7 @@ import {
   type QueryKey,
 } from "@tanstack/query-core";
 import * as query from "./query-client";
+import { createQueryResult } from "./create-query-result";
 import { subscribeToQuery, type QueryHandle } from "./subscribe-to-query";
 
 export function createInfiniteQuery<
@@ -27,5 +28,5 @@ export function createInfiniteQuery<
   const { queryClient } = handle.context.get(query.Context);
   const observer = new InfiniteQueryObserver(queryClient, options);
   subscribeToQuery(handle, observer);
-  return observer;
+  return createQueryResult(observer);
 }

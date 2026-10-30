@@ -5,6 +5,7 @@ import {
   type QueryObserverOptions,
 } from "@tanstack/query-core";
 import * as query from "./query-client";
+import { createQueryResult } from "./create-query-result";
 import { subscribeToQuery, type QueryHandle } from "./subscribe-to-query";
 
 export function createQuery<
@@ -25,5 +26,5 @@ export function createQuery<
   const { queryClient } = handle.context.get(query.Context);
   const observer = new QueryObserver(queryClient, options);
   subscribeToQuery(handle, observer);
-  return observer;
+  return createQueryResult(observer);
 }
