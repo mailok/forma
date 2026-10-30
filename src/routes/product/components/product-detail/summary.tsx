@@ -5,11 +5,11 @@ import { ProductColors } from "@/components/product/product-colors";
 import { StockStatus } from "@/components/product/stock-status";
 import type { Product } from "@/db/types";
 
-interface ProductSummaryProps {
+interface SummaryProps {
   product: Product;
 }
 
-export function ProductSummary(handle: Handle<ProductSummaryProps>) {
+export function Summary(handle: Handle<SummaryProps>) {
   return () => {
     const { product } = handle.props;
 

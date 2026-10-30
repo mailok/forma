@@ -7,7 +7,7 @@ interface Props {
   onRetry: () => void;
 }
 
-export function ProductLoadError(handle: Handle<Props>) {
+export function LoadError(handle: Handle<Props>) {
   return () => (
     <main id="product" class="scroll-mt-20" aria-labelledby="product-heading">
       <Container class="py-16 sm:py-24">

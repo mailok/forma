@@ -1,6 +1,6 @@
 import { NavLink, SiteHeader } from "@/components/site-header";
 
-export function ProductHeader() {
+export function Header() {
   return () => (
     <SiteHeader>
       <NavLink href="/#catalog" active class="hidden sm:block">

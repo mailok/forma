@@ -2,7 +2,7 @@ import { Icon } from "@/components/icon";
 import { Container } from "@/components/layout/container";
 import { paths } from "@/lib/paths";
 
-export function ProductNotFound() {
+export function NotFound() {
   return () => (
     <main
       id="product"

@@ -13,7 +13,7 @@ interface Props {
   name: string;
 }
 
-export function ProductBreadcrumbs(handle: Handle<Props>) {
+export function Breadcrumbs(handle: Handle<Props>) {
   return () => {
     const { category, name } = handle.props;
     const breadcrumbs: Breadcrumb[] = [

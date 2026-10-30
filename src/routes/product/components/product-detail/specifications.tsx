@@ -12,7 +12,7 @@ interface Props {
   specifications: Product["specifications"];
 }
 
-export function ProductSpecifications(handle: Handle<Props>) {
+export function Specifications(handle: Handle<Props>) {
   return () => {
     const specifications = listSpecifications(handle.props.specifications);
 

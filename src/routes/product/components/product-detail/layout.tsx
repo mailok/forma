@@ -8,7 +8,7 @@ interface Props {
   busy?: boolean;
 }
 
-export function ProductLayout(handle: Handle<Props>) {
+export function Layout(handle: Handle<Props>) {
   return () => (
     <main
       id="product"

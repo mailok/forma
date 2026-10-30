@@ -8,7 +8,7 @@ interface Props {
   product: Product;
 }
 
-export function ProductGallery(handle: Handle<Props>) {
+export function Gallery(handle: Handle<Props>) {
   return () => {
     const { product } = handle.props;
 
