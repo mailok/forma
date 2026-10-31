@@ -43,7 +43,7 @@ function HeroIntro(handle: Handle<HeroIntroProps>) {
         </p>
         <h1
           id="catalog-heading"
-          class="font-display text-[52px] leading-[0.92] tracking-tight text-ink sm:text-[72px] xl:text-[88px]"
+          class="font-hero text-[52px] leading-[1.03] tracking-tight text-ink sm:text-[72px] xl:text-[88px]"
         >
           Good objects,
           <br />
