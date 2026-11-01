@@ -1,28 +1,39 @@
 import { on, type Handle } from "remix/component";
 import * as catalog from "@/routes/catalog/components/catalog";
+import { isLoadingSelection } from "@/routes/catalog/models/catalog-search";
 import { Icon } from "@/components/icon";
 import { Button } from "@/components/ui/button";
 
 export function ResultsPagination(handle: Handle) {
   const { search } = handle.context.get(catalog.Context);
-  search.updateOn(handle, ["resultschange", "statuschange"]);
+  search.query.subscribe(
+    (previous, next) => {
+      if (
+        previous.data !== next.data ||
+        previous.hasNextPage !== next.hasNextPage ||
+        previous.isFetchingNextPage !== next.isFetchingNextPage ||
+        isLoadingSelection(previous) !== isLoadingSelection(next)
+      ) {
+        void handle.update();
+      }
+    },
+    { signal: handle.signal },
+  );
 
   return () => {
-    const { searchResults, status } = search;
-    if (!searchResults.items.length) {
+    const { hasNextPage, isFetchingNextPage } = search.query;
+    const { items, total } = search.results;
+    if (!items.length) {
       return null;
     }
 
     return (
       <div class="flex flex-col items-center gap-5 pt-20 pb-4">
-        <DiscoveryProgress
-          shown={searchResults.items.length}
-          total={searchResults.total}
-        />
-        {searchResults.hasMore ? (
+        <DiscoveryProgress shown={items.length} total={total} />
+        {hasNextPage ? (
           <LoadMoreButton
-            loading={status === "loading-more"}
-            disabled={status !== "idle"}
+            loading={isFetchingNextPage}
+            disabled={isFetchingNextPage || isLoadingSelection(search.query)}
             onLoadMore={() => search.loadMore()}
           />
         ) : null}

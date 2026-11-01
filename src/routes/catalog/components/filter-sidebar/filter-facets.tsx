@@ -7,10 +7,18 @@ import { FilterLegend } from "./filter-label";
 
 export function FilterFacets(handle: Handle) {
   const { search } = handle.context.get(catalog.Context);
-  search.updateOn(handle, ["filterschange", "resultschange", "errorchange"]);
+  search.updateOn(handle, ["filterschange"]);
+  search.query.subscribe(
+    (previous, next) => {
+      if (previous.data !== next.data || previous.error !== next.error) {
+        void handle.update();
+      }
+    },
+    { signal: handle.signal },
+  );
 
   return () => {
-    const { filters, searchResults } = search;
+    const { filters, results } = search;
 
     if (!search.facetsMatchCategory) {
       return (
@@ -18,16 +26,18 @@ export function FilterFacets(handle: Handle) {
           role="status"
           class="border-t border-line py-7 text-[13px] text-stone-400"
         >
-          {search.error ? "Retry to load the filters." : "Preparing filters…"}
+          {search.query.error
+            ? "Retry to load the filters."
+            : "Preparing filters…"}
         </p>
       );
     }
 
     return (
       <>
-        {searchResults.facets.map((group) => (
+        {results.facets.map((group) => (
           <FilterSection
-            key={`${searchResults.filters.category}-${group.key}`}
+            key={`${results.filters.category}-${group.key}`}
             group={group}
             selectedValues={filters[group.key]}
             onToggle={(value) => search.toggleFilter(group.key, value)}

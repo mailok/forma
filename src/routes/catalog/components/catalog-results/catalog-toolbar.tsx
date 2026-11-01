@@ -1,5 +1,6 @@
 import { on, type Handle, type RemixNode } from "remix/component";
 import * as catalog from "@/routes/catalog/components/catalog";
+import { isLoadingSelection } from "@/routes/catalog/models/catalog-search";
 import { Icon, type IconName } from "@/components/icon";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select/select";
@@ -52,10 +53,20 @@ function ToolbarGroup(handle: Handle<ToolbarGroupProps>) {
 
 function ResultCount(handle: Handle) {
   const { search } = handle.context.get(catalog.Context);
-  search.updateOn(handle, ["statuschange", "resultschange"]);
+  search.query.subscribe(
+    (previous, next) => {
+      if (
+        previous.data !== next.data ||
+        isLoadingSelection(previous) !== isLoadingSelection(next)
+      ) {
+        void handle.update();
+      }
+    },
+    { signal: handle.signal },
+  );
 
   return () => {
-    const { status, searchResults } = search;
+    const { total } = search.results;
 
     return (
       <p
@@ -63,7 +74,7 @@ function ResultCount(handle: Handle) {
         aria-live="polite"
         class="flex h-8 items-baseline gap-2 text-sm text-stone-500"
       >
-        {status === "loading" ? (
+        {isLoadingSelection(search.query) ? (
           <span class="flex items-center gap-2 self-center text-forest">
             <Icon name="spinner" class="size-4 animate-spin" />
             Updating your selection…
@@ -71,11 +82,9 @@ function ResultCount(handle: Handle) {
         ) : (
           <>
             <span class="text-[22px] leading-none font-semibold tracking-[-0.02em] text-ink tabular-nums">
-              {searchResults.total}
+              {total}
             </span>
-            {searchResults.total === 1
-              ? "product to discover"
-              : "products to discover"}
+            {total === 1 ? "product to discover" : "products to discover"}
           </>
         )}
       </p>

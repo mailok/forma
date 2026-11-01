@@ -28,6 +28,7 @@ function CatalogProvider(handle: Handle<Props, CatalogContext>) {
   const search = new CatalogSearch({
     queryClient,
     initialSearchResults: handle.props.initialSearchResults,
+    signal: handle.signal,
   });
 
   handle.context.set({
@@ -40,8 +41,7 @@ function CatalogProvider(handle: Handle<Props, CatalogContext>) {
     syncCatalogUrl(search.filters),
   );
 
-  // Subscribing can start a fetch, so connect only after browser commit, never SSR.
-  handle.queueTask(() => search.connect({ signal: handle.signal }));
+  handle.queueTask(() => search.query.mount({ signal: handle.signal }));
 
   return () => handle.props.children;
 }

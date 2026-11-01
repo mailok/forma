@@ -1,27 +1,41 @@
 import type { Handle } from "remix/component";
 import { cn } from "@/lib/utils";
 import * as catalog from "@/routes/catalog/components/catalog";
+import { isLoadingSelection } from "@/routes/catalog/models/catalog-search";
 import { ProductList } from "./product-list";
 import { EmptyResults } from "./empty-results";
 
 export function ProductResults(handle: Handle) {
   const { search, ui } = handle.context.get(catalog.Context);
-  search.updateOn(handle, ["statuschange", "resultschange"]);
   ui.updateOn(handle, ["viewchange"]);
+  search.query.subscribe(
+    (previous, next) => {
+      if (
+        previous.data !== next.data ||
+        previous.isFetchingNextPage !== next.isFetchingNextPage ||
+        isLoadingSelection(previous) !== isLoadingSelection(next)
+      ) {
+        void handle.update();
+      }
+    },
+    { signal: handle.signal },
+  );
 
   return () => {
-    const { status, searchResults } = search;
+    const { isFetchingNextPage } = search.query;
+    const loadingSelection = isLoadingSelection(search.query);
+    const { items } = search.results;
 
     return (
       <div
-        aria-busy={status !== "idle"}
+        aria-busy={loadingSelection || isFetchingNextPage}
         class={cn(
           "transition-opacity duration-200",
-          status === "loading" ? "opacity-45" : "opacity-100",
+          loadingSelection ? "opacity-45" : "opacity-100",
         )}
       >
-        {searchResults.items.length ? (
-          <ProductList products={searchResults.items} view={ui.view} />
+        {items.length ? (
+          <ProductList products={items} view={ui.view} />
         ) : (
           <EmptyResults onReset={() => search.resetFilters()} />
         )}

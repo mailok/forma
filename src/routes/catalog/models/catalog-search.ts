@@ -1,7 +1,6 @@
-import {
-  InfiniteQueryObserver,
-  type InfiniteQueryObserverResult,
-  type QueryClient,
+import type {
+  InfiniteQueryObserverResult,
+  QueryClient,
 } from "@tanstack/query-core";
 import { searchQueryMaxLength } from "@/db/catalog-options";
 import { defaultSearchProductsFilters } from "@/db/default-search-products-filters";
@@ -12,6 +11,7 @@ import type {
   SearchProductsResult,
   SortOrder,
 } from "@/db/types";
+import { createInfiniteQuery } from "@/integrations/tanstack-query/create-infinite-query";
 import { Model } from "@/lib/model";
 import { catalogQueries } from "@/routes/catalog/queries";
 import { countSearchProductsFilters } from "@/routes/catalog/search-products-filters";
@@ -19,26 +19,32 @@ import { countSearchProductsFilters } from "@/routes/catalog/search-products-fil
 interface CatalogSearchEvents {
   filterschange: void;
   categorychange: void;
-  resultschange: void;
-  statuschange: void;
-  errorchange: void;
 }
 
 export class CatalogSearch extends Model<CatalogSearchEvents> {
-  #query: SearchObserver;
+  readonly query: SearchQuery;
   #filters: SearchProductsFilters;
-  #queryState: QueryState;
+  #lastResults: SearchProductsResult;
   #pendingSearch: ReturnType<typeof setTimeout> | undefined;
 
   constructor(options: CatalogSearchOptions) {
     super();
-    this.#query = createSearchObserver(options);
+    this.query = createSearchQuery(options);
     this.#filters = { ...options.initialSearchResults.filters };
-    this.#queryState = {
-      searchResults: options.initialSearchResults,
-      status: "idle",
-      error: null,
-    };
+    this.#lastResults = options.initialSearchResults;
+    this.query.subscribe(
+      (_previous, next) => {
+        if (next.data) {
+          this.#lastResults = next.data;
+        }
+      },
+      { signal: options.signal },
+    );
+    options.signal.addEventListener(
+      "abort",
+      () => this.#cancelPendingSearch(),
+      { once: true },
+    );
   }
 
   get filters(): SearchProductsFilters {
@@ -49,37 +55,13 @@ export class CatalogSearch extends Model<CatalogSearchEvents> {
     return countSearchProductsFilters(this.#filters);
   }
 
-  get searchResults(): SearchProductsResult {
-    return this.#queryState.searchResults;
+  // Keep the displayed selection if a new search fails without cached data.
+  get results(): SearchProductsResult {
+    return this.query.data ?? this.#lastResults;
   }
 
   get facetsMatchCategory(): boolean {
-    return this.searchResults.filters.category === this.#filters.category;
-  }
-
-  get status(): CatalogSearchStatus {
-    return this.#queryState.status;
-  }
-
-  get error(): string | null {
-    return this.#queryState.error;
-  }
-
-  connect({ signal }: CatalogSearchConnection): void {
-    if (signal.aborted) {
-      return;
-    }
-    const unsubscribe = this.#query.subscribe(() => this.#publishQueryState());
-    signal.addEventListener(
-      "abort",
-      () => {
-        this.#cancelPendingSearch();
-        unsubscribe();
-      },
-      { once: true },
-    );
-    // Reconcile cache changes between construction and subscription.
-    this.#publishQueryState();
+    return this.results.filters.category === this.#filters.category;
   }
 
   setQuery(value: string): void {
@@ -114,20 +96,19 @@ export class CatalogSearch extends Model<CatalogSearchEvents> {
   }
 
   loadMore(): void {
-    if (this.status !== "idle" || !this.#query.getCurrentResult().hasNextPage) {
+    const { hasNextPage, isFetchingNextPage, fetchNextPage } = this.query;
+    if (!hasNextPage || isFetchingNextPage || isLoadingSelection(this.query)) {
       return;
     }
-    void this.#query.fetchNextPage();
-    this.#publishQueryState();
+    void fetchNextPage();
   }
 
   retry(): void {
-    if (this.#query.getCurrentResult().isFetchNextPageError) {
-      void this.#query.fetchNextPage();
+    if (this.query.isFetchNextPageError) {
+      void this.query.fetchNextPage();
     } else {
-      void this.#query.refetch();
+      void this.query.refetch();
     }
-    this.#publishQueryState();
   }
 
   #applyFilters(patch: FiltersPatch, request?: SearchRequest): void {
@@ -147,76 +128,49 @@ export class CatalogSearch extends Model<CatalogSearchEvents> {
     }
   }
 
+  // A debounced search keeps its query disabled until the input settles, so
+  // `isEnabled` tells readers that a search is pending.
   #requestSearch({ debounceMs = 0 }: SearchRequest = {}): void {
     this.#cancelPendingSearch();
-    this.#query.setOptions({
+    this.query.setOptions({
       ...catalogQueries.search(this.#filters),
       enabled: debounceMs === 0,
     });
     if (debounceMs) {
       this.#pendingSearch = setTimeout(() => this.#startSearch(), debounceMs);
     }
-    this.#publishQueryState();
   }
 
   #startSearch(): void {
     this.#pendingSearch = undefined;
-    this.#query.setOptions(catalogQueries.search(this.#filters));
-    this.#publishQueryState();
+    this.query.setOptions(catalogQueries.search(this.#filters));
   }
 
   #cancelPendingSearch(): void {
     clearTimeout(this.#pendingSearch);
     this.#pendingSearch = undefined;
   }
+}
 
-  // The observer notifies on every fetch flag, so only announce values the UI reads.
-  #publishQueryState(): void {
-    const previous = this.#queryState;
-    const next = this.#readQueryState();
-    this.#queryState = next;
-    if (next.searchResults !== previous.searchResults) {
-      this.dispatch("resultschange");
-    }
-    if (next.status !== previous.status) {
-      this.dispatch("statuschange");
-    }
-    if (next.error !== previous.error) {
-      this.dispatch("errorchange");
-    }
-  }
+export type SearchQueryState =
+  InfiniteQueryObserverResult<SearchProductsResult>;
 
-  #readQueryState(): QueryState {
-    const result = this.#query.getCurrentResult();
-    const searchPending = this.#pendingSearch !== undefined;
-    return {
-      // Keep the displayed selection if a new query fails without cached data.
-      searchResults: result.data ?? this.#queryState.searchResults,
-      status: searchPending ? "loading" : queryStatus(result),
-      error: searchPending ? null : (result.error?.message ?? null),
-    };
-  }
+// Placeholder data reports success, so a refetch over current results stays silent.
+export function isLoadingSelection(query: SearchQueryState): boolean {
+  return (
+    !query.isEnabled ||
+    (query.isFetching && (query.isPlaceholderData || !query.isSuccess))
+  );
 }
 
 const searchDebounceMs = 280;
 
-type CatalogSearchStatus = "idle" | "loading" | "loading-more";
 type FiltersPatch = Partial<Omit<SearchProductsFilters, "page" | "limit">>;
-type SearchObserver = ReturnType<typeof createSearchObserver>;
-type SearchObserverResult = InfiniteQueryObserverResult<SearchProductsResult>;
-
-interface QueryState {
-  searchResults: SearchProductsResult;
-  status: CatalogSearchStatus;
-  error: string | null;
-}
+type SearchQuery = ReturnType<typeof createSearchQuery>;
 
 interface CatalogSearchOptions {
   queryClient: QueryClient;
   initialSearchResults: SearchProductsResult;
-}
-
-interface CatalogSearchConnection {
   signal: AbortSignal;
 }
 
@@ -224,29 +178,17 @@ interface SearchRequest {
   debounceMs?: number;
 }
 
-function createSearchObserver({
+function createSearchQuery({
   queryClient,
   initialSearchResults,
 }: CatalogSearchOptions) {
-  return new InfiniteQueryObserver(queryClient, {
+  return createInfiniteQuery(queryClient, {
     ...catalogQueries.search(initialSearchResults.filters),
     initialData: {
       pages: [initialSearchResults],
       pageParams: [1],
     },
   });
-}
-
-function queryStatus(result: SearchObserverResult): CatalogSearchStatus {
-  if (result.isFetchingNextPage) {
-    return "loading-more";
-  }
-  return isLoadingSelection(result) ? "loading" : "idle";
-}
-
-// Placeholder data reports success, so a refetch over current results stays silent.
-function isLoadingSelection(result: SearchObserverResult): boolean {
-  return result.isFetching && (result.isPlaceholderData || !result.isSuccess);
 }
 
 function toggleValue(values: string[], value: string): string[] {

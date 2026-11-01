@@ -14,7 +14,15 @@ interface SelectedFacet {
 
 export function ActiveFilters(handle: Handle) {
   const { categories, search } = handle.context.get(catalog.Context);
-  search.updateOn(handle, ["filterschange", "resultschange"]);
+  search.updateOn(handle, ["filterschange"]);
+  search.query.subscribe(
+    (previous, next) => {
+      if (previous.data !== next.data) {
+        void handle.update();
+      }
+    },
+    { signal: handle.signal },
+  );
 
   function categoryLabel() {
     const { category } = search.filters;
@@ -22,13 +30,13 @@ export function ActiveFilters(handle: Handle) {
   }
 
   function selectedFacets(): SelectedFacet[] {
-    const { filters, searchResults } = search;
+    const { filters, results } = search;
     return filterKeys.flatMap((key) =>
       filters[key].map((value) => ({
         key,
         value,
         label:
-          searchResults.facets
+          results.facets
             .find((facet) => facet.key === key)
             ?.options.find((option) => option.value === value)?.label ?? value,
       })),
